@@ -12,6 +12,7 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   navigationPath: string | null; // Add this
+  role: UserRole | null; // Add this
 }
 
 const initialState: AuthState = {
@@ -22,6 +23,7 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   navigationPath: null, // Add this
+  role: null, // Add this
 };
 
 export interface RegisterDto {
@@ -197,7 +199,13 @@ const authSlice = createSlice({
         state.username = action.payload.user.username;
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
-        state.navigationPath = "/dashboard";
+        state.role = action.payload.user.role; // Add this
+        console.log("autoLogin -> action.payload", action.payload);
+        if (action.payload.user.role === UserRole.CUSTOMER) {
+          state.navigationPath = "/dashboard";
+        } else {
+          state.navigationPath = "/admin";
+        }
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -232,8 +240,13 @@ const authSlice = createSlice({
         state.username = action.payload.username;
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
-        if (!window.location.pathname.includes("/dashboard")) {
+        state.role = action.payload.user.role; // Add this
+        // check role and redirect to the correct path
+        console.log("autoLogin -> action.payload", action.payload);
+        if (action.payload.user.role === UserRole.CUSTOMER) {
           state.navigationPath = "/dashboard";
+        } else {
+          state.navigationPath = "/admin";
         }
       })
       .addCase(autoLogin.rejected, (state, action) => {
@@ -249,6 +262,7 @@ const authSlice = createSlice({
         state.refreshToken = null;
         state.isAuthenticated = false;
         state.loading = false;
+        state.role = null; // Add this
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         state.navigationPath = "/login";

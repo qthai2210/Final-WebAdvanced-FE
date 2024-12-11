@@ -7,12 +7,16 @@ import { autoLogin } from "../store/auth/authSlice";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  roles?: string[];
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export default function ProtectedRoute({
+  children,
+  roles,
+}: ProtectedRouteProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated, loading, navigationPath } = useSelector(
+  const { isAuthenticated, loading, navigationPath, role } = useSelector(
     (state: RootState) => state.auth
   );
 
@@ -28,11 +32,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
             toast.error("Please login to access this page");
             navigate("/login", { replace: true });
           }
+        } else {
+          navigate("/login", { replace: true });
         }
-        // else {
-        //   toast.error("Please login to access this page");
-        //   navigate("/login", { replace: true });
-        // }
       }
     };
 
@@ -44,6 +46,20 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       navigate(navigationPath, { replace: true });
     }
   }, [navigationPath, navigate]);
+
+  useEffect(() => {
+    if (isAuthenticated && roles && role) {
+      if (!roles.includes(role)) {
+        // use timeout to avoid the error message from react-toastify
+        setTimeout(() => {
+          toast.error("You are not authorized to access this page");
+        }, 2000);
+        //toast.error("You are not authorized to access this page");
+        console.log("You are not authorized to access this page");
+        navigate("/unauthorized", { replace: true });
+      }
+    }
+  }, [isAuthenticated, roles, role, navigate]);
 
   if (loading) {
     return <div>Loading...</div>; // Or your loading component
