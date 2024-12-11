@@ -1,9 +1,18 @@
 import axios from "axios";
 import { store } from "../store/store";
-import { logout } from "../store/auth/authSlice";
+import { logout, refreshToken } from "../store/auth/authSlice";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
+// New instance for public endpoints (no auth required)
+export const publicAxios = axios.create({
+  baseURL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Protected instance (requires authentication)
 export const axiosInstance = axios.create({
   baseURL,
   headers: {
@@ -11,11 +20,10 @@ export const axiosInstance = axios.create({
   },
 });
 
-// Add a request interceptor
+// Add request interceptor only to protected instance
 axiosInstance.interceptors.request.use(
   (config) => {
-    const state = store.getState();
-    const token = state.auth.accessToken;
+    const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -26,13 +34,35 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Add a response interceptor
+// Add response interceptor only to protected instance
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      store.dispatch(logout());
-      window.location.href = "/login";
+      const accessToken = localStorage.getItem("accessToken");
+      if (accessToken) {
+        try {
+          const verifyResponse = await axiosInstance.post("/auth/verify-token");
+          const verifyData = verifyResponse.data.data;
+
+          if (!verifyData.isValid && !verifyData.isExpired) {
+            // Try refresh token
+            await store.dispatch(refreshToken()).unwrap();
+            // Retry original request
+            return axiosInstance(error.config);
+          } else {
+            // Token is invalid and expired
+            store.dispatch(logout());
+            window.location.href = "/login";
+          }
+        } catch (error) {
+          store.dispatch(logout());
+          window.location.href = "/login";
+        }
+      } else {
+        store.dispatch(logout());
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

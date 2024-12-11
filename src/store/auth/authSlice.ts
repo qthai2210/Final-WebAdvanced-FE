@@ -1,6 +1,8 @@
-import { UserRole } from "@/types/RegisterDto";
+import { publicAxios, axiosInstance } from "@/lib/axios";
+import { UserRole } from "@/types/Enums/User.enum";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+
+import { toast } from "react-toastify";
 
 interface AuthState {
   username: any | null;
@@ -9,6 +11,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  navigationPath: string | null; // Add this
 }
 
 const initialState: AuthState = {
@@ -18,6 +21,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
+  navigationPath: null, // Add this
 };
 
 export interface RegisterDto {
@@ -39,13 +43,19 @@ export const login = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post("/api/auth/login", {
+      const response = await publicAxios.post("auth/login", {
         username,
         password,
       });
-      localStorage.setItem("token", response.data.token);
-      return response.data;
+      const data = response.data.data;
+      console.log(data);
+      // Store tokens immediately
+      localStorage.setItem("accessToken", data.access_token);
+      localStorage.setItem("refreshToken", data.refresh_token);
+
+      return data;
     } catch (error: any) {
+      toast.error(error.response?.data?.message || "Login failed");
       return rejectWithValue((error.response?.data as any).message);
     }
   }
@@ -68,7 +78,7 @@ export const register = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post("/api/auth/register", {
+      const response = await publicAxios.post("/auth/register", {
         email,
         password,
         username,
@@ -79,7 +89,8 @@ export const register = createAsyncThunk(
         address,
         role,
       });
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("accessToken", response.data.access_token);
+      localStorage.setItem("refreshToken", response.data.refresh_token);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response.data.message);
@@ -87,9 +98,83 @@ export const register = createAsyncThunk(
   }
 );
 
-export const logout = createAsyncThunk("auth/logout", async () => {
-  localStorage.removeItem("token");
-});
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      // Optional: Call server-side logout endpoint if needed
+      // await axiosInstance.post('/auth/logout');
+
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      return null;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Logout failed");
+    }
+  }
+);
+
+export const verifyToken = createAsyncThunk(
+  "auth/verifyToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/auth/verify-token");
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Token verification failed"
+      );
+    }
+  }
+);
+
+export const refreshToken = createAsyncThunk(
+  "auth/refreshToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      const refresh_token = localStorage.getItem("refreshToken");
+      const response = await axiosInstance.post("/auth/refresh-token", {
+        refresh_token,
+      });
+      const data = response.data.data;
+      localStorage.setItem("accessToken", data.access_token);
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Token refresh failed"
+      );
+    }
+  }
+);
+
+export const autoLogin = createAsyncThunk(
+  "auth/autoLogin",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      const verifyResult = await dispatch(verifyToken()).unwrap();
+      console.log("autoLogin -> verifyResult", verifyResult);
+
+      if (!verifyResult.isValid) {
+        if (!verifyResult.isExpired) {
+          // Token is invalid but not expired, try refresh
+          const refreshResult = await dispatch(refreshToken()).unwrap();
+          if (refreshResult) {
+            const response = await axiosInstance.post("/auth/relogin");
+            return response.data.data;
+          }
+        }
+        throw new Error("Token expired or invalid");
+      }
+
+      const response = await axiosInstance.post("/auth/relogin");
+      return response.data.data;
+    } catch (error: any) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      return rejectWithValue(error.message || "Auto login failed");
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -109,11 +194,10 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.isAuthenticated = true;
-        state.username = action.payload.username;
-        state.accessToken = action.payload.accessToken;
-        state.refreshToken = action.payload.refreshToken;
-        localStorage.setItem("accessToken", action.payload.accessToken);
-        localStorage.setItem("refreshToken", action.payload.refreshToken);
+        state.username = action.payload.user.username;
+        state.accessToken = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
+        state.navigationPath = "/dashboard";
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -137,6 +221,27 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
+      // Auto Login
+      .addCase(autoLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(autoLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.username = action.payload.username;
+        state.accessToken = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
+        if (!window.location.pathname.includes("/dashboard")) {
+          state.navigationPath = "/dashboard";
+        }
+      })
+      .addCase(autoLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.isAuthenticated = false;
+        state.navigationPath = "/login";
+      })
       // Logout
       .addCase(logout.fulfilled, (state) => {
         state.username = null;
@@ -146,6 +251,19 @@ const authSlice = createSlice({
         state.loading = false;
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        state.navigationPath = "/login";
+      })
+      .addCase(verifyToken.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        state.accessToken = action.payload.access_token;
+      })
+      .addCase(refreshToken.rejected, (state) => {
+        state.isAuthenticated = false;
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/login";
       });
   },
 });

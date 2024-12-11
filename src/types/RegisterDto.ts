@@ -1,7 +1,4 @@
-export enum UserRole {
-  CUSTOMER = "CUSTOMER",
-  ADMIN = "ADMIN",
-}
+import { UserRole } from "./Enums/User.enum";
 
 export interface RegisterDto {
   username: string;
