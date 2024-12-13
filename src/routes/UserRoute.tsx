@@ -3,6 +3,8 @@ import LoginPage from "../pages/LoginPage";
 import DashboardPage from "../pages/DashboardPage";
 import Layout from "../components/Layout";
 import ProtectedRoute from "./ProtectedRoute";
+import CreateDebtPage from "@/pages/CreateDebtPage";
+import { DebtManagementPage } from "@/pages/DebtManagementPage";
 
 export const UserRoutes: RouteObject[] = [
   {
@@ -44,6 +46,22 @@ export const UserRoutes: RouteObject[] = [
         //     <CardsPage />
         //   </ProtectedRoute>
         // ),
+      },
+      {
+        path: "/debts",
+        element: (
+          <ProtectedRoute>
+            <DebtManagementPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/debts/create",
+        element: (
+          <ProtectedRoute>
+            <CreateDebtPage />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

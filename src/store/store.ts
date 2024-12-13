@@ -1,8 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./auth/authSlice";
+import debtReducer from "./debt/debtSlice";
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    debt: debtReducer,
   },
 });
 

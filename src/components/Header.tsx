@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Bell, User, Menu, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
-import { logout } from "../store/auth/authSlice";
+import { logout, setNavigationPath } from "../store/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 
 const Header: React.FC = () => {
@@ -35,6 +35,10 @@ const Header: React.FC = () => {
     navigate("/login");
   };
 
+  const handleNavigation = (path: string) => {
+    dispatch(setNavigationPath(path));
+  };
+
   return (
     <header className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,19 +50,39 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">
+            <Link
+              to="/dashboard"
+              className="text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/dashboard")}
+            >
               Dashboard
             </Link>
             <Link
               to="/transactions"
               className="text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/transactions")}
             >
               Transactions
             </Link>
-            <Link to="/payments" className="text-gray-700 hover:text-blue-600">
+            <Link
+              to="/payments"
+              className="text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/payments")}
+            >
               Payments
             </Link>
-            <Link to="/cards" className="text-gray-700 hover:text-blue-600">
+            <Link
+              to="/debts"
+              className="text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/debts")}
+            >
+              Debt Management
+            </Link>
+            <Link
+              to="/cards"
+              className="text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/cards")}
+            >
               Cards
             </Link>
           </nav>
@@ -134,24 +158,35 @@ const Header: React.FC = () => {
             <Link
               to="/dashboard"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/dashboard")}
             >
               Dashboard
             </Link>
             <Link
               to="/transactions"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/transactions")}
             >
               Transactions
             </Link>
             <Link
               to="/payments"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/payments")}
             >
               Payments
             </Link>
             <Link
+              to="/debts"
+              className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/debts")}
+            >
+              Debt Management
+            </Link>
+            <Link
               to="/cards"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/cards")}
             >
               Cards
             </Link>

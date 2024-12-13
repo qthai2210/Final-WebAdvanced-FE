@@ -185,6 +185,9 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    setNavigationPath: (state, action) => {
+      state.navigationPath = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -282,5 +285,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, setNavigationPath } = authSlice.actions;
 export default authSlice.reducer;
