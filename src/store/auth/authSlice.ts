@@ -206,6 +206,8 @@ const authSlice = createSlice({
         console.log("autoLogin -> action.payload", action.payload);
         if (action.payload.user.role === UserRole.CUSTOMER) {
           state.navigationPath = "/dashboard";
+        } else if (action.payload.user.role === UserRole.EMPLOYEE) {
+          state.navigationPath = "/employee";
         } else {
           state.navigationPath = "/admin";
         }
@@ -248,6 +250,8 @@ const authSlice = createSlice({
         console.log("autoLogin -> action.payload", action.payload);
         if (action.payload.user.role === UserRole.CUSTOMER) {
           state.navigationPath = "/dashboard";
+        } else if (action.payload.user.role === UserRole.EMPLOYEE) {
+          state.navigationPath = "/employee";
         } else {
           state.navigationPath = "/admin";
         }

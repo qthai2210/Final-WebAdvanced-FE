@@ -6,5 +6,10 @@ import { RouteObject } from "react-router-dom";
 
 import { UserRoutes } from "./UserRoute";
 import { AdminRoutes } from "./AdminRoutes";
+import { EmployeeRoutes } from "./EmployeeRoute";
 
-export const routes: RouteObject[] = [...UserRoutes, ...AdminRoutes];
+export const routes: RouteObject[] = [
+  ...UserRoutes,
+  ...AdminRoutes,
+  ...EmployeeRoutes,
+];
