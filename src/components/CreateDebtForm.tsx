@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Button, TextField, Paper, Typography, Box } from "@mui/material";
 import { toast } from "react-toastify";
-import { debtService } from "../services/debt.service";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { createDebt } from "@/store/debt/debtSlice";
 
 interface CreateDebtFormProps {
   onSuccess?: () => void;
@@ -10,8 +12,9 @@ interface CreateDebtFormProps {
 export const CreateDebtForm: React.FC<CreateDebtFormProps> = ({
   onSuccess,
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const [formData, setFormData] = useState({
-    toUserId: "",
+    accountNumber: "",
     amount: "",
     content: "",
   });
@@ -19,12 +22,13 @@ export const CreateDebtForm: React.FC<CreateDebtFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await debtService.createDebt({
-        ...formData,
-        amount: Number(formData.amount),
-      });
-      toast.success("Debt reminder created successfully");
-      setFormData({ toUserId: "", amount: "", content: "" });
+      await dispatch(
+        createDebt({
+          ...formData,
+          amount: Number(formData.amount),
+        })
+      ).unwrap();
+      setFormData({ accountNumber: "", amount: "", content: "" });
       if (onSuccess) onSuccess();
     } catch (error: any) {
       toast.error(error.message || "Failed to create debt reminder");
@@ -43,9 +47,9 @@ export const CreateDebtForm: React.FC<CreateDebtFormProps> = ({
       <TextField
         fullWidth
         margin="normal"
-        label="User ID"
-        name="toUserId"
-        value={formData.toUserId}
+        label="Account Number"
+        name="accountNumber"
+        value={formData.accountNumber}
         onChange={handleChange}
         required
       />

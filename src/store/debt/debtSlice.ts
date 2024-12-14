@@ -9,6 +9,7 @@ import {
 
 interface DebtState {
   debts: any[];
+  createdDebts: any[]; // Add this line
   loading: boolean;
   error: string | null;
   selectedDebt: any | null;
@@ -16,7 +17,8 @@ interface DebtState {
 }
 
 const initialState: DebtState = {
-  debts: [],
+  debts: [], // Ensure this is initialized as empty array
+  createdDebts: [], // Ensure this is initialized as empty array
   loading: false,
   error: null,
   selectedDebt: null,
@@ -27,8 +29,9 @@ export const fetchDebts = createAsyncThunk(
   "debt/fetchDebts",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await debtService.getDebts();
-      return response.data;
+      const response = await debtService.getMyDebts();
+      console.log("my debts response:", response); // Add this for debugging
+      return response; // Remove .data since getMyDebts already returns the data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch debts"
@@ -37,10 +40,25 @@ export const fetchDebts = createAsyncThunk(
   }
 );
 
+export const fetchCreatedDebts = createAsyncThunk(
+  "debt/fetchCreatedDebts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await debtService.getCreatedDebts();
+      console.log("created debts response:", response); // Add this for debugging
+      return response; // Add .data here if needed
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch created debts"
+      );
+    }
+  }
+);
+
 export const createDebt = createAsyncThunk(
   "debt/createDebt",
   async (
-    debtData: { toUserId: string; amount: number; content: string },
+    debtData: { accountNumber: string; amount: number; content: string },
     { rejectWithValue }
   ) => {
     try {
@@ -119,6 +137,19 @@ const debtSlice = createSlice({
         state.debts = action.payload;
       })
       .addCase(fetchDebts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Fetch Created Debts
+      .addCase(fetchCreatedDebts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCreatedDebts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.createdDebts = action.payload;
+      })
+      .addCase(fetchCreatedDebts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })

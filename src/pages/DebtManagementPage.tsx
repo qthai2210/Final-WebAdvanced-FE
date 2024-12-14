@@ -2,14 +2,22 @@ import React, { useEffect, useState } from "react";
 import { Container, Typography, Box, Tab, Tabs, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
-import { fetchDebts, fetchDebtSummary } from "@/store/debt/debtSlice";
+import {
+  fetchDebts,
+  fetchCreatedDebts,
+  fetchDebtSummary,
+} from "@/store/debt/debtSlice";
 import { DebtSummaryCard } from "../components/DebtSummaryCard";
 import { DebtDialog } from "../components/DebtDialog";
+import { DebtDetailCard } from "@/components/DebtDetailCard";
 
 export const DebtManagementPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { debts, summary, loading } = useSelector(
-    (state: RootState) => state.debt
+  const { debts, createdDebts, summary, loading } = useSelector(
+    (state: RootState) => {
+      console.log("Current state:", state.debt); // Add this for debugging
+      return state.debt;
+    }
   );
   const [tabValue, setTabValue] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -19,13 +27,25 @@ export const DebtManagementPage: React.FC = () => {
   }, [dispatch]);
 
   const loadData = async () => {
-    await Promise.all([dispatch(fetchDebts()), dispatch(fetchDebtSummary())]);
+    await Promise.all([
+      dispatch(fetchDebts()),
+      dispatch(fetchCreatedDebts()),
+      dispatch(fetchDebtSummary()),
+    ]);
   };
 
   const handleOpenDialog = () => setIsDialogOpen(true);
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     loadData(); // Reload data after creating new debt
+  };
+
+  const handlePayDebt = (debtId: string) => {
+    // Implement payment logic
+  };
+
+  const handleCancelDebt = (debtId: string) => {
+    // Implement cancel logic
   };
 
   if (loading) {
@@ -61,14 +81,22 @@ export const DebtManagementPage: React.FC = () => {
       <Box sx={{ mt: 3 }}>
         {tabValue === 0 ? (
           <div>
-            {summary?.createdDebts.map((debt) => (
-              <div key={debt._id}>{/* Add debt detail component here */}</div>
+            {(createdDebts || []).map((debt) => (
+              <DebtDetailCard
+                key={debt._id}
+                debt={debt}
+                onCancel={handleCancelDebt}
+              />
             ))}
           </div>
         ) : (
           <div>
-            {summary?.receivedDebts.map((debt) => (
-              <div key={debt._id}>{/* Add debt detail component here */}</div>
+            {(debts || []).map((debt) => (
+              <DebtDetailCard
+                key={debt._id}
+                debt={debt}
+                onPay={handlePayDebt}
+              />
             ))}
           </div>
         )}
