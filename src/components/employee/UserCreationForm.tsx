@@ -10,7 +10,7 @@ import {
   createUserAccount,
   verifyUserOtp,
 } from "@/store/employee/employeeSlice";
-import { toast } from "react-toastify";
+
 import * as z from "zod";
 import { RegisterWithoutPasswordDto, UserRole } from "@/types/user.types";
 import { OtpVerificationDialog } from "./OtpVerificationDialog";
