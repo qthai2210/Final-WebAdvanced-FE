@@ -1,43 +1,39 @@
-import { useState, useEffect } from "react";
-import { axiosInstance } from "../../lib/axios";
-import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
 import { FaTrash, FaEdit } from "react-icons/fa";
-
-interface Staff {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  // Add other staff properties
-}
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { fetchEmployees, deleteEmployee } from "@/store/admin/adminSlice";
+import { Employee } from "@/types/admin.types";
+import { UpdateEmployeeDialog } from "./UpdateEmployeeDialog";
 
 export default function StaffManagement() {
-  const [staff, setStaff] = useState<Staff[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { employees, loading, error } = useSelector(
+    (state: RootState) => state.admin
+  );
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
   useEffect(() => {
-    fetchStaff();
-  }, []);
-
-  const fetchStaff = async () => {
-    try {
-      const response = await axiosInstance.get("/admin/staff");
-      setStaff(response.data.data);
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to fetch staff list");
-    }
-  };
+    dispatch(fetchEmployees());
+  }, [dispatch]);
 
   const handleDeleteStaff = async (id: string) => {
-    try {
-      await axiosInstance.delete(`/admin/staff/${id}`);
-      toast.success("Staff member deleted successfully");
-      fetchStaff();
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to delete staff member");
-    }
+    dispatch(deleteEmployee(id));
   };
+
+  const handleEditClick = (employee: Employee) => {
+    setEditingEmployee(employee);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsEditModalOpen(false);
+    setEditingEmployee(null);
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
@@ -61,9 +57,11 @@ export default function StaffManagement() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {staff.map((member) => (
+            {employees.map((member) => (
               <tr key={member.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">{member.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {member.username}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">{member.email}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{member.role}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -73,7 +71,10 @@ export default function StaffManagement() {
                   >
                     <FaTrash />
                   </button>
-                  <button className="text-blue-600 hover:text-blue-900">
+                  <button
+                    onClick={() => handleEditClick(member)}
+                    className="text-blue-600 hover:text-blue-900"
+                  >
                     <FaEdit />
                   </button>
                 </td>
@@ -82,6 +83,12 @@ export default function StaffManagement() {
           </tbody>
         </table>
       </div>
+
+      <UpdateEmployeeDialog
+        employee={editingEmployee}
+        isOpen={isEditModalOpen}
+        onClose={handleCloseDialog}
+      />
     </div>
   );
 }

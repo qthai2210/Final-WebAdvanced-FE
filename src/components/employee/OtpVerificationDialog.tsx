@@ -1,5 +1,5 @@
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+// import { useSelector } from "react-redux";
+// import { RootState } from "@/store/store";
 import {
   Dialog,
   DialogContent,
@@ -26,9 +26,9 @@ export function OtpVerificationDialog({
 }: OtpVerificationDialogProps) {
   const [otp, setOtp] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
-  const { verificationLoading } = useSelector(
-    (state: RootState) => state.employee
-  );
+  // const { verificationLoading } = useSelector(
+  //   (state: RootState) => state.employee
+  // );
 
   const handleVerify = async () => {
     try {

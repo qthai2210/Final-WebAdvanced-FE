@@ -2,6 +2,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./auth/authSlice";
 import debtReducer from "./debt/debtSlice";
 import employeeReducer from "./employee/employeeSlice";
+import adminReducer from "./admin/adminSlice";
+
 import recipientReducer from "./recipient/recipientSlice";
 import transactionReducer from "./transaction/transactionSlice";
 export const store = configureStore({
@@ -9,6 +11,7 @@ export const store = configureStore({
     auth: authReducer,
     debt: debtReducer,
     employee: employeeReducer,
+    admin: adminReducer,
     recipient: recipientReducer,
     transaction: transactionReducer,
   },
