@@ -2,12 +2,15 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./auth/authSlice";
 import debtReducer from "./debt/debtSlice";
 import employeeReducer from "./employee/employeeSlice";
-
+import recipientReducer from "./recipient/recipientSlice";
+import transactionReducer from "./transaction/transactionSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     debt: debtReducer,
     employee: employeeReducer,
+    recipient: recipientReducer,
+    transaction: transactionReducer,
   },
 });
 
