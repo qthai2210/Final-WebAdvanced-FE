@@ -3,6 +3,7 @@ import authReducer from "./auth/authSlice";
 import debtReducer from "./debt/debtSlice";
 import employeeReducer from "./employee/employeeSlice";
 import adminReducer from "./admin/adminSlice";
+import notificationsReducer from "./notifications/notificationSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     debt: debtReducer,
     employee: employeeReducer,
     admin: adminReducer,
+    notifications: notificationsReducer,
   },
 });
 

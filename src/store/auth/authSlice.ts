@@ -1,6 +1,7 @@
 import { publicAxios, axiosInstance } from "@/lib/axios";
 import { UserRole } from "@/types/Enums/User.enum";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { connectSocket, disconnectSocket } from "@/lib/socket";
 
 import { toast } from "react-toastify";
 
@@ -50,10 +51,14 @@ export const login = createAsyncThunk(
         password,
       });
       const data = response.data.data;
-      console.log(data);
-      // Store tokens immediately
+
       localStorage.setItem("accessToken", data.access_token);
       localStorage.setItem("refreshToken", data.refresh_token);
+
+      // Connect socket with a slight delay to ensure auth state is updated
+      setTimeout(() => {
+        connectSocket(data.user.username);
+      }, 500);
 
       return data;
     } catch (error: any) {
@@ -159,6 +164,7 @@ export const autoLogin = createAsyncThunk(
       if (!verifyResult.isValid) {
         if (!verifyResult.isExpired) {
           // Token is invalid but not expired, try refresh
+          console.log("autoLogin -> refreshToken");
           const refreshResult = await dispatch(refreshToken()).unwrap();
           if (refreshResult) {
             const response = await axiosInstance.post("/auth/relogin");
@@ -203,6 +209,10 @@ const authSlice = createSlice({
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
         state.role = action.payload.user.role; // Add this
+
+        // Connect socket after successful login
+        connectSocket(action.payload.user.id);
+
         console.log("autoLogin -> action.payload", action.payload);
         if (action.payload.user.role === UserRole.CUSTOMER) {
           state.navigationPath = "/dashboard";
@@ -246,6 +256,10 @@ const authSlice = createSlice({
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
         state.role = action.payload.user.role; // Add this
+
+        // Connect socket after successful auto login
+        connectSocket(action.payload.user.id);
+
         // check role and redirect to the correct path
         console.log("autoLogin -> action.payload", action.payload);
         if (action.payload.user.role === UserRole.CUSTOMER) {
@@ -270,6 +284,10 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.loading = false;
         state.role = null; // Add this
+
+        // Disconnect socket on logout
+        disconnectSocket();
+
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         state.navigationPath = "/login";

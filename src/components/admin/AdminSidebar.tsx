@@ -5,7 +5,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { AppDispatch } from "@/store/store";
 import { useDispatch } from "react-redux";
 import { setNavigationPath } from "@/store/auth/authSlice";
-import { useState } from "react";
 
 const menuItems = [
   {
@@ -39,24 +38,11 @@ export function AdminSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
-  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div
-      className={cn(
-        "min-h-screen bg-gray-900 text-white p-4 space-y-4 fixed left-0 top-0 transition-all duration-300",
-        isExpanded ? "w-64" : "w-20"
-      )}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
-    >
-      <div
-        className={cn(
-          "text-xl font-bold pb-4 border-b border-gray-700 overflow-hidden whitespace-nowrap",
-          !isExpanded && "text-center"
-        )}
-      >
-        {isExpanded ? "Admin Panel" : "AP"}
+    <div className="min-h-screen w-64 bg-gray-900 text-white p-4 space-y-4 fixed left-0 top-0">
+      <div className="text-xl font-bold pb-4 border-b border-gray-700">
+        Admin Panel
       </div>
       <nav className="space-y-2">
         {menuItems.map((item) => (
@@ -64,16 +50,13 @@ export function AdminSidebar() {
             key={item.path}
             variant="ghost"
             className={cn(
-              "w-full justify-start gap-2 text-gray-300 hover:text-white hover:bg-gray-800 overflow-hidden",
-              location.pathname === item.path && "bg-gray-800 text-white",
-              !isExpanded && "justify-center"
+              "w-full justify-start gap-2 text-gray-300 hover:text-white hover:bg-gray-800",
+              location.pathname === item.path && "bg-gray-800 text-white"
             )}
             onClick={() => dispatch(setNavigationPath(item.path))}
           >
-            <item.icon className="h-5 w-5 flex-shrink-0" />
-            {isExpanded && (
-              <span className="transition-opacity">{item.title}</span>
-            )}
+            <item.icon className="h-5 w-5" />
+            {item.title}
           </Button>
         ))}
       </nav>
