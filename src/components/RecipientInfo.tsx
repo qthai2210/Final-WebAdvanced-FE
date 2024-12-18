@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchRecipientByAccount } from "@/store/recipient/recipientSlice";
 import { AppDispatch, RootState } from "@/store/store";

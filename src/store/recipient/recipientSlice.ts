@@ -87,6 +87,10 @@ const recipientSlice = createSlice({
           nickname: recipient.nickname || "",
         }));
       })
+      .addCase(fetchSavedRecipients.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
       .addCase(fetchRecipientByAccount.fulfilled, (state, action) => {
         state.loading = false;
         state.recipientInfo = {
@@ -101,6 +105,10 @@ const recipientSlice = createSlice({
       .addCase(saveNewRecipient.pending, (state) => {
         state.loading = true;
         state.error = null;
+      })
+      .addCase(saveNewRecipient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       })
       .addCase(saveNewRecipient.fulfilled, (state, action) => {
         state.loading = false;

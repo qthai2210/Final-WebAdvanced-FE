@@ -26,22 +26,30 @@ export const UserRoutes: RouteObject[] = [
         ),
       },
       {
+        path: "transactions/internal",
+        element: (
+          <ProtectedRoute>
+            <TransferPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "transactions",
         element: (
           <ProtectedRoute>
             <RecipientListPage />
           </ProtectedRoute>
         ),
-        children: [
-          {
-            path: "internal",
-            element: (
-              <ProtectedRoute>
-                <TransferPage />
-              </ProtectedRoute>
-            ),
-          },
-        ],
+        // children: [
+        //   {
+        //     path: "internal",
+        //     element: (
+        //       <ProtectedRoute>
+        //         <TransferPage />
+        //       </ProtectedRoute>
+        //     ),
+        //   },
+        // ],
       },
       {
         path: "payments",

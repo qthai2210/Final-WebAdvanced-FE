@@ -9,6 +9,7 @@ class RecipientService {
 
   async addRecipient(recipientDto: RecipientDto): Promise<Recipient> {
     const response = await axiosInstance.post("/recipients", recipientDto);
+    console.log("addRecipient", response);
     return response.data;
   }
 
