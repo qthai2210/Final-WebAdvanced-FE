@@ -3,6 +3,9 @@ import authReducer from "./auth/authSlice";
 import debtReducer from "./debt/debtSlice";
 import employeeReducer from "./employee/employeeSlice";
 import adminReducer from "./admin/adminSlice";
+import recipientReducer from "./recipient/recipientSlice";
+import transactionReducer from "./transaction/transactionSlice";
+import accountReducer from "./account/accountSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +13,9 @@ export const store = configureStore({
     debt: debtReducer,
     employee: employeeReducer,
     admin: adminReducer,
+    recipient: recipientReducer,
+    transaction: transactionReducer,
+    account: accountReducer,
   },
 });
 

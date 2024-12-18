@@ -5,6 +5,8 @@ import Layout from "../components/Layout";
 import ProtectedRoute from "./ProtectedRoute";
 import CreateDebtPage from "@/pages/CreateDebtPage";
 import { DebtManagementPage } from "@/pages/DebtManagementPage";
+import TransferPage from "@/pages/TransferPage";
+import RecipientListPage from "@/pages/RecipientListPage";
 
 export const UserRoutes: RouteObject[] = [
   {
@@ -24,12 +26,30 @@ export const UserRoutes: RouteObject[] = [
         ),
       },
       {
+        path: "transactions/internal",
+        element: (
+          <ProtectedRoute>
+            <TransferPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "transactions",
-        // element: (
-        //   <ProtectedRoute>
-        //     <TransactionsPage />
-        //   </ProtectedRoute>
-        // ),
+        element: (
+          <ProtectedRoute>
+            <RecipientListPage />
+          </ProtectedRoute>
+        ),
+        // children: [
+        //   {
+        //     path: "internal",
+        //     element: (
+        //       <ProtectedRoute>
+        //         <TransferPage />
+        //       </ProtectedRoute>
+        //     ),
+        //   },
+        // ],
       },
       {
         path: "payments",

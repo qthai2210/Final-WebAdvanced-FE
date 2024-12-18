@@ -19,6 +19,7 @@ export default function ProtectedRoute({
   const { isAuthenticated, loading, navigationPath, role } = useSelector(
     (state: RootState) => state.auth
   );
+  console.log("current Navigation Path: ", navigationPath);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -43,6 +44,7 @@ export default function ProtectedRoute({
 
   useEffect(() => {
     if (navigationPath) {
+      console.log("Navigating to: ", navigationPath);
       navigate(navigationPath, { replace: true });
     }
   }, [navigationPath, navigate]);
