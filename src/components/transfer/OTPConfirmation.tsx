@@ -13,6 +13,7 @@ const OTPConfirmation: React.FC<OTPConfirmationProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(otp);
     onConfirm(otp);
   };
 

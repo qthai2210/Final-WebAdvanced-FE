@@ -8,14 +8,14 @@ import { toast } from "react-toastify";
 interface Props {
   recipient: {
     accountNumber: string;
-    name: string;
+    nickname?: string;
   };
   onClose: () => void;
 }
 
 const SaveRecipientPrompt: React.FC<Props> = ({ recipient, onClose }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const [nickname, setNickname] = useState(recipient.name);
+  const [nickname, setNickname] = useState(recipient.nickname || "");
 
   const handleSave = async () => {
     try {

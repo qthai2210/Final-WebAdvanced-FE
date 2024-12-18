@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { confirmTransfer } from "@/store/transaction/transactionSlice";
+import { AppDispatch } from "@/store/store";
 
 interface Props {
   transactionId: string;
 }
 
 const OTPConfirmation: React.FC<Props> = ({ transactionId }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [otp, setOtp] = useState("");
 
   const handleConfirm = () => {

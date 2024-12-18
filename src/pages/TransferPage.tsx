@@ -46,14 +46,16 @@ const TransferPage = () => {
 
   const handleOTPConfirm = async (otp: string) => {
     try {
-      if (!currentTransfer?.id) {
+      console.log("currentTransfer", currentTransfer);
+      if (!currentTransfer?._id) {
+        console.log("No active transfer found");
         toast.error("No active transfer found");
         return;
       }
 
       await dispatch(
         confirmTransfer({
-          transactionId: currentTransfer.id,
+          transactionId: currentTransfer._id.toString(),
           otp,
         })
       ).unwrap();
@@ -115,7 +117,6 @@ const TransferPage = () => {
         <SaveRecipientPrompt
           recipient={{
             accountNumber: formData.toAccount,
-            name: currentTransfer.recipientName,
           }}
           onClose={() => setShowSavePrompt(false)}
         />

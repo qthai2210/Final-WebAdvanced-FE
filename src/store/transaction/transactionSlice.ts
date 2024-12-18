@@ -38,6 +38,7 @@ export const confirmTransfer = createAsyncThunk(
   "transaction/confirmTransfer",
   async (otpData: TransactionOtpData, { rejectWithValue }) => {
     try {
+      console.log("otpData", otpData);
       const response = await transactionService.confirmTransfer(otpData);
       toast.success("Transfer completed successfully");
       return response;
