@@ -46,7 +46,7 @@ const RecipientForm: React.FC<RecipientFormProps> = ({
         if (response) {
           setFormData((prev) => ({
             ...prev,
-            nickname: response.name || prev.nickname,
+            nickname: response.nickname || prev.nickname,
           }));
         }
       } catch (err) {
@@ -78,9 +78,17 @@ const RecipientForm: React.FC<RecipientFormProps> = ({
                 }))
               }
               onBlur={handleAccountBlur}
-              className="w-full p-2 border rounded"
+              className={`w-full p-2 border rounded ${
+                initialData ? "bg-gray-100" : ""
+              }`}
+              readOnly={initialData !== null}
               placeholder="Enter account number"
             />
+            {initialData && (
+              <p className="text-sm text-gray-500 mt-1">
+                Account number cannot be changed
+              </p>
+            )}
           </div>
 
           <div>

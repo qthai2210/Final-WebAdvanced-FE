@@ -65,6 +65,38 @@ export const fetchRecipientByAccount = createAsyncThunk(
   }
 );
 
+export const updateRecipient = createAsyncThunk(
+  "recipient/updateRecipient",
+  async (recipientData: RecipientDto, { rejectWithValue }) => {
+    try {
+      const response = await recipientService.updateRecipient(recipientData);
+      toast.success("Recipient updated successfully");
+      return response;
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to update recipient"
+      );
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const removeRecipient = createAsyncThunk(
+  "recipient/removeRecipient",
+  async (accountNumber: string, { rejectWithValue }) => {
+    try {
+      await recipientService.removeRecipient(accountNumber);
+      toast.success("Recipient removed successfully");
+      return accountNumber;
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to remove recipient"
+      );
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
 const recipientSlice = createSlice({
   name: "recipient",
   initialState,
@@ -117,6 +149,44 @@ const recipientSlice = createSlice({
           id: action.payload._id || "",
           nickname: action.payload.nickname || "",
         });
+      })
+      // Update recipient
+      .addCase(updateRecipient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateRecipient.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.savedRecipients.findIndex(
+          (recipient) =>
+            recipient.accountNumber === action.payload.accountNumber
+        );
+        if (index !== -1) {
+          state.savedRecipients[index] = {
+            ...action.payload,
+            id: action.payload._id || "",
+            nickname: action.payload.nickname || "",
+          };
+        }
+      })
+      .addCase(updateRecipient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Remove recipient
+      .addCase(removeRecipient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeRecipient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.savedRecipients = state.savedRecipients.filter(
+          (recipient) => recipient.accountNumber !== action.payload
+        );
+      })
+      .addCase(removeRecipient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });
