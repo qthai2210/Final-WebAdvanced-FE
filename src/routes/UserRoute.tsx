@@ -7,6 +7,8 @@ import CreateDebtPage from "@/pages/CreateDebtPage";
 import { DebtManagementPage } from "@/pages/DebtManagementPage";
 import TransferPage from "@/pages/TransferPage";
 import RecipientListPage from "@/pages/RecipientListPage";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
 
 export const UserRoutes: RouteObject[] = [
   {
@@ -16,6 +18,14 @@ export const UserRoutes: RouteObject[] = [
       {
         path: "login",
         element: <LoginPage />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPasswordPage />,
+      },
+      {
+        path: "reset-password",
+        element: <ResetPasswordPage />,
       },
       {
         path: "dashboard",

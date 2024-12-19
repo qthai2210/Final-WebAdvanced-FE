@@ -34,4 +34,27 @@ export const authService = {
   logout: () => {
     localStorage.removeItem("token");
   },
+
+  forgotPassword: async (email: string) => {
+    await axiosInstance.post("/auth/forgot-password", { email });
+  },
+
+  verifyOTPForgotPassword: async (email: string, otp: string) => {
+    await axiosInstance.post("/auth/verify-otp", {
+      email,
+      otp,
+    });
+  },
+
+  resetPassword: async (
+    email: string,
+    newPassword: string,
+    confirmPassword: string
+  ) => {
+    await axiosInstance.post("/auth/reset-password", {
+      email,
+      newPassword,
+      confirmPassword,
+    });
+  },
 };
