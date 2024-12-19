@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { fetchRecipientByAccount } from "@/store/recipient/recipientSlice";
@@ -7,21 +7,43 @@ import { toast } from "react-toastify";
 
 interface Props {
   onSelect: (recipient: Recipient) => void;
+  accountNumber?: string;
 }
 
-const RecipientSelector: React.FC<Props> = ({ onSelect }) => {
+const RecipientSelector: React.FC<Props> = ({ onSelect, accountNumber }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const [accountNumber, setAccountNumber] = useState("");
+  const [inputAccountNumber, setInputAccountNumber] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState<Recipient | null>(
     null
   );
   const { loading, error } = useSelector((state: RootState) => state.recipient);
 
+  useEffect(() => {
+    if (accountNumber) {
+      setInputAccountNumber(accountNumber);
+      const fetchRecipient = async () => {
+        try {
+          const recipientData = await dispatch(
+            fetchRecipientByAccount(accountNumber)
+          ).unwrap();
+          if (recipientData) {
+            setSelectedRecipient(recipientData);
+            onSelect(recipientData);
+          }
+        } catch (error: any) {
+          toast.error(error.message || "Account not found");
+          setSelectedRecipient(null);
+        }
+      };
+      fetchRecipient();
+    }
+  }, [accountNumber, dispatch, onSelect]);
+
   const handleAccountBlur = async () => {
-    if (accountNumber.length >= 10) {
+    if (inputAccountNumber.length >= 10) {
       try {
         const recipientData = await dispatch(
-          fetchRecipientByAccount(accountNumber)
+          fetchRecipientByAccount(inputAccountNumber)
         ).unwrap();
         if (recipientData) {
           setSelectedRecipient(recipientData);
@@ -40,8 +62,8 @@ const RecipientSelector: React.FC<Props> = ({ onSelect }) => {
         <label className="block text-sm font-medium">Recipient Account</label>
         <input
           type="text"
-          value={accountNumber}
-          onChange={(e) => setAccountNumber(e.target.value)}
+          value={inputAccountNumber}
+          onChange={(e) => setInputAccountNumber(e.target.value)}
           onBlur={handleAccountBlur}
           placeholder="Enter account number"
           className="w-full p-2 border rounded"
