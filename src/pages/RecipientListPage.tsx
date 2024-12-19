@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchSavedRecipients,
   saveNewRecipient,
+  updateRecipient,
 } from "@/store/recipient/recipientSlice";
 import RecipientList from "../components/RecipientList";
 import { Recipient, RecipientDto } from "@/types/recipient.types";
@@ -26,13 +27,19 @@ const RecipientListPage = () => {
   }, [dispatch]);
 
   const handleSubmit = async (data: RecipientDto) => {
-    if (editingRecipient) {
-      //await dispatch(updateRecipient(data));
-    } else {
-      await dispatch(saveNewRecipient(data));
+    try {
+      if (editingRecipient) {
+        await dispatch(updateRecipient(data)).unwrap();
+      } else {
+        await dispatch(saveNewRecipient(data)).unwrap();
+      }
+      setIsFormOpen(false);
+      setEditingRecipient(null);
+      // Refresh the list after update/save
+      dispatch(fetchSavedRecipients());
+    } catch (error) {
+      console.error("Failed to save/update recipient:", error);
     }
-    setIsFormOpen(false);
-    setEditingRecipient(null);
   };
 
   const handleEdit = (recipient: Recipient) => {

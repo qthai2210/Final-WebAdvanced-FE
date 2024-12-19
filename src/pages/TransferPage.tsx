@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { AppDispatch, RootState } from "@/store/store";
 import {
   initiateTransfer,
@@ -27,6 +28,16 @@ const TransferPage = () => {
   });
   const [showOTP, setShowOTP] = useState(false);
   const [showSavePrompt, setShowSavePrompt] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [accountNumber, setAccountNumber] = useState<string>("");
+
+  useEffect(() => {
+    const accountFromUrl = searchParams.get("accountNumber");
+    if (accountFromUrl) {
+      setAccountNumber(accountFromUrl);
+      setFormData((prev) => ({ ...prev, toAccount: accountFromUrl }));
+    }
+  }, [searchParams]);
 
   const handleTransfer = async () => {
     try {
@@ -82,6 +93,7 @@ const TransferPage = () => {
       />
 
       <RecipientSelector
+        accountNumber={accountNumber}
         onSelect={(recipient) =>
           setFormData((prev) => ({
             ...prev,
