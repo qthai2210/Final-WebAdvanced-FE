@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { AppDispatch, RootState } from "@/store/store";
@@ -14,6 +14,7 @@ import TransferDetails from "../components/transfer/TransferDetails";
 import FeePaymentMethod from "../components/transfer/FeePaymentMethod";
 import OTPConfirmation from "../components/transfer/OTPConfirmation";
 import SaveRecipientPrompt from "../components/transfer/SaveRecipientPrompt";
+import { setNavigationPath } from "@/store/auth/authSlice";
 
 const TransferPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,6 +31,7 @@ const TransferPage = () => {
   const [showSavePrompt, setShowSavePrompt] = useState(false);
   const [searchParams] = useSearchParams();
   const [accountNumber, setAccountNumber] = useState<string>("");
+  const [isExistingRecipient, setIsExistingRecipient] = useState(false);
 
   useEffect(() => {
     const accountFromUrl = searchParams.get("accountNumber");
@@ -70,9 +72,15 @@ const TransferPage = () => {
           otp,
         })
       ).unwrap();
+
       toast.success("Transfer completed successfully");
       setShowOTP(false);
-      setShowSavePrompt(true);
+
+      if (isExistingRecipient) {
+        dispatch(setNavigationPath("/dashboard"));
+      } else {
+        setShowSavePrompt(true);
+      }
     } catch (error: any) {
       toast.error(error.message || "Failed to confirm transfer");
     }
@@ -94,12 +102,13 @@ const TransferPage = () => {
 
       <RecipientSelector
         accountNumber={accountNumber}
-        onSelect={(recipient) =>
+        onSelect={(recipient) => {
           setFormData((prev) => ({
             ...prev,
             toAccount: recipient.accountNumber,
-          }))
-        }
+          }));
+          setIsExistingRecipient(recipient.isRecipient);
+        }}
       />
 
       <TransferDetails
@@ -125,12 +134,15 @@ const TransferPage = () => {
         />
       )}
 
-      {showSavePrompt && (
+      {showSavePrompt && !isExistingRecipient && (
         <SaveRecipientPrompt
           recipient={{
             accountNumber: formData.toAccount,
           }}
-          onClose={() => setShowSavePrompt(false)}
+          onClose={() => {
+            setShowSavePrompt(false);
+            dispatch(setNavigationPath("/dashboard"));
+          }}
         />
       )}
     </div>

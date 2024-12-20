@@ -15,6 +15,7 @@ export interface Recipient {
   updatedAt: string;
   __v: number;
   nickname?: string;
+  isRecipient: boolean;
 }
 
 export interface CreateRecipientDto {

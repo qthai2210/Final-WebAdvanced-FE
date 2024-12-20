@@ -77,7 +77,15 @@ const RecipientSelector: React.FC<Props> = ({ onSelect, accountNumber }) => {
             <h3 className="font-medium text-gray-700">Account Information</h3>
             <div className="mt-1 text-sm text-gray-600">
               <p>Account Number: {selectedRecipient.accountNumber}</p>
-              <p>Nickname: {selectedRecipient.nickname}</p>
+              <p>
+                {selectedRecipient.isRecipient ? "Nickname" : "Username"}:{" "}
+                {selectedRecipient.nickname}
+              </p>
+              <p className="text-xs text-gray-500">
+                {selectedRecipient.isRecipient
+                  ? "(Saved Recipient)"
+                  : "(New Recipient)"}
+              </p>
             </div>
           </div>
         )}
