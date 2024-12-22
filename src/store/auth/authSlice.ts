@@ -74,6 +74,36 @@ export const login = createAsyncThunk(
   }
 );
 
+export const loginWithCaptcha = createAsyncThunk(
+  "auth/login/secure",
+  async (
+    {
+      username,
+      password,
+      recaptchaToken,
+    }: { username: string; password: string; recaptchaToken: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await publicAxios.post("auth/login/secure", {
+        username,
+        password,
+        recaptchaToken,
+      });
+      const data = response.data.data;
+      console.log(data);
+      // Store tokens immediately
+      localStorage.setItem("accessToken", data.access_token);
+      localStorage.setItem("refreshToken", data.refresh_token);
+
+      return data;
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Login failed");
+      return rejectWithValue((error.response?.data as any).message);
+    }
+  }
+);
+
 export const register = createAsyncThunk(
   "auth/register",
   async (
@@ -287,6 +317,32 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
+      // Login with reCAPTCHA
+      // .addCase(login.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
+      .addCase(loginWithCaptcha.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.username = action.payload.user.username;
+        state.accessToken = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
+        state.role = action.payload.user.role; // Add this
+        localStorage.removeItem("recaptchaToken");
+        console.log("autoLogin -> action.payload", action.payload);
+        if (action.payload.user.role === UserRole.CUSTOMER) {
+          state.navigationPath = "/dashboard";
+        } else if (action.payload.user.role === UserRole.EMPLOYEE) {
+          state.navigationPath = "/employee";
+        } else {
+          state.navigationPath = "/admin";
+        }
+      })
+      // .addCase(login.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = action.payload as string;
+      // })
       // Register
       .addCase(register.pending, (state) => {
         state.loading = true;
