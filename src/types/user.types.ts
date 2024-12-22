@@ -4,6 +4,12 @@ export enum UserRole {
   CUSTOMER = "customer",
 }
 
+export enum UserStatus {
+  ACTIVE = "active",
+  LOCKED = "locked",
+  PENDING = "pending",
+}
+
 export interface RegisterWithoutPasswordDto {
   username: string;
   email: string;

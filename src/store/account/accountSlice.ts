@@ -1,8 +1,9 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import { accountService } from "@/services/account.service";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { accountService, AccountResponse } from "@/services/account.service";
 
 interface AccountState {
+  accounts: AccountResponse[];
   account: any;
   accountByNumber: any;
   loading: boolean;
@@ -10,11 +11,20 @@ interface AccountState {
 }
 
 const initialState: AccountState = {
+  accounts: [],
   account: null,
   accountByNumber: null,
   loading: false,
   error: null,
 };
+
+export const fetchUserAccounts = createAsyncThunk(
+  "account/fetchUserAccounts",
+  async () => {
+    const accounts = await accountService.getMyAccounts();
+    return accounts;
+  }
+);
 
 export const getUserAccounts = createAsyncThunk(
   "account/getUserAccounts",
@@ -60,6 +70,19 @@ const accountSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      //Fetch Accounts
+      .addCase(fetchUserAccounts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserAccounts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.accounts = action.payload;
+      })
+      .addCase(fetchUserAccounts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to fetch accounts";
+      })
       // Fetch Account
       .addCase(getUserAccounts.pending, (state) => {
         state.loading = true;

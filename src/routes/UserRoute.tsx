@@ -5,6 +5,10 @@ import Layout from "../components/Layout";
 import ProtectedRoute from "./ProtectedRoute";
 import CreateDebtPage from "@/pages/CreateDebtPage";
 import { DebtManagementPage } from "@/pages/DebtManagementPage";
+import TransferPage from "@/pages/TransferPage";
+import RecipientListPage from "@/pages/RecipientListPage";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import { RecipientsListPage } from "@/pages/RecipientsListPage";
 
 export const UserRoutes: RouteObject[] = [
@@ -17,10 +21,26 @@ export const UserRoutes: RouteObject[] = [
         element: <LoginPage />,
       },
       {
+        path: "forgot-password",
+        element: <ForgotPasswordPage />,
+      },
+      {
+        path: "reset-password",
+        element: <ResetPasswordPage />,
+      },
+      {
         path: "dashboard",
         element: (
           <ProtectedRoute>
             <DashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "transactions/internal",
+        element: (
+          <ProtectedRoute>
+            <TransferPage />
           </ProtectedRoute>
         ),
       },
@@ -34,11 +54,21 @@ export const UserRoutes: RouteObject[] = [
       },
       {
         path: "transactions",
-        // element: (
-        //   <ProtectedRoute>
-        //     <TransactionsPage />
-        //   </ProtectedRoute>
-        // ),
+        element: (
+          <ProtectedRoute>
+            <RecipientListPage />
+          </ProtectedRoute>
+        ),
+        // children: [
+        //   {
+        //     path: "internal",
+        //     element: (
+        //       <ProtectedRoute>
+        //         <TransferPage />
+        //       </ProtectedRoute>
+        //     ),
+        //   },
+        // ],
       },
       {
         path: "payments",

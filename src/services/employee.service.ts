@@ -1,17 +1,6 @@
 import { axiosInstance } from "../lib/axios";
 import { RegisterWithoutPasswordDto, UserRole } from "@/types/user.types";
 
-interface CustomerResponse {
-  id: string;
-  username: string;
-  email: string;
-  phone: string;
-  fullName: string;
-  identityNumber?: string;
-  dateOfBirth?: Date;
-  address?: string;
-}
-
 export const employeeService = {
   createCustomerAccount: async (userData: RegisterWithoutPasswordDto) => {
     const response = await axiosInstance.post("/auth/register-with-otp", {

@@ -5,16 +5,27 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { logout, setNavigationPath } from "../store/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import {
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+  fetchNotifications,
+  fetchUnreadCount,
+} from "@/store/notifications/notificationSlice";
 import { getUserAccounts } from "@/store/account/accountSlice";
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isProfileOpen, setIsProfileOpen] = React.useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
   const profileRef = React.useRef<HTMLDivElement>(null);
+  const notificationsRef = React.useRef<HTMLDivElement>(null);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { isAuthenticated, username } = useSelector(
     (state: RootState) => state.auth
+  );
+  const { notifications, unreadCount } = useSelector(
+    (state: RootState) => state.notifications
   );
   const { account } = useSelector((state: RootState) => state.account);
 
@@ -27,10 +38,23 @@ const Header: React.FC = () => {
       ) {
         setIsProfileOpen(false);
       }
+      if (
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target as Node)
+      ) {
+        setIsNotificationsOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchNotifications());
+      dispatch(fetchUnreadCount());
+    }
+  }, [isAuthenticated, dispatch]);
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -41,6 +65,19 @@ const Header: React.FC = () => {
   const handleNavigation = (path: string) => {
     dispatch(setNavigationPath(path));
     dispatch(getUserAccounts());
+  };
+
+  const handleMarkAsRead = (notificationId: string) => {
+    dispatch(markNotificationAsRead(notificationId));
+  };
+
+  const handleMarkAllAsRead = () => {
+    dispatch(markAllNotificationsAsRead());
+  };
+
+  // Add helper function to generate unique keys
+  const generateUniqueKey = (notification: any) => {
+    return `${notification._id}-${notification.createdAt}-${notification.type}`;
   };
 
   return (
@@ -109,12 +146,62 @@ const Header: React.FC = () => {
             </div>
 
             {/* Notifications */}
-            <button className="text-gray-500 hover:text-blue-600 relative">
-              <Bell size={20} />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                3
-              </span>
-            </button>
+            <div className="relative" ref={notificationsRef}>
+              <button
+                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                className="text-gray-500 hover:text-blue-600 relative"
+              >
+                <Bell size={20} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notifications Dropdown */}
+              {isNotificationsOpen && (
+                <div className="absolute right-0 mt-2 w-80 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50">
+                  <div className="flex justify-between items-center px-4 py-2 border-b">
+                    <h3 className="text-sm font-medium">Notifications</h3>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={handleMarkAllAsRead}
+                        className="text-xs text-blue-600 hover:text-blue-800"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.map((notification, index) => (
+                        <div
+                          key={generateUniqueKey(notification) || index}
+                          onClick={() => handleMarkAsRead(notification._id)}
+                          className={`px-4 py-3 hover:bg-gray-50 cursor-pointer ${
+                            !notification.isRead ? "bg-blue-50" : ""
+                          }`}
+                        >
+                          <p className="text-sm text-gray-900">
+                            {notification.content}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(
+                              notification.createdAt || ""
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-sm text-gray-500">
+                        No notifications
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Profile Dropdown */}
             <div className="relative" ref={profileRef}>

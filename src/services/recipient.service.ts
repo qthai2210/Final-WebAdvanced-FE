@@ -1,28 +1,31 @@
 import { axiosInstance } from "../lib/axios";
+import { RecipientDto, Recipient } from "@/types/recipient.types";
 
-interface RecipientDto {
-  accountNumber: string;
-  nickname?: string;
-}
-
-export const recipientService = {
-  createRecipient: async (data: RecipientDto) => {
-    const response = await axiosInstance.post("/recipients", data);
-    return response.data;
-  },
-
-  getMyRecipients: async () => {
+class RecipientService {
+  async getRecipients(): Promise<Recipient[]> {
     const response = await axiosInstance.get("/recipients");
     return response.data;
-  },
+  }
 
-  updateRecipient: async (data: RecipientDto) => {
-    const response = await axiosInstance.put("/recipients", data);
+  async addRecipient(recipientDto: RecipientDto): Promise<Recipient> {
+    const response = await axiosInstance.post("/recipients", recipientDto);
+    console.log("addRecipient", response);
     return response.data;
-  },
+  }
 
-  deleteRecipient: async (accountNumber: string) => {
-    const response = await axiosInstance.delete(`/recipients/${accountNumber}`);
+  async updateRecipient(recipientDto: RecipientDto): Promise<Recipient> {
+    const response = await axiosInstance.put("/recipients", recipientDto);
     return response.data;
-  },
-};
+  }
+
+  async removeRecipient(accountNumber: string): Promise<void> {
+    await axiosInstance.delete(`/recipients/${accountNumber}`);
+  }
+
+  async getRecipientByAccount(accountNumber: string): Promise<Recipient> {
+    const response = await axiosInstance.get(`/accounts/${accountNumber}`);
+    return response.data;
+  }
+}
+
+export const recipientService = new RecipientService();

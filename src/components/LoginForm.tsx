@@ -128,8 +128,9 @@ const LoginForm: React.FC = () => {
           </div>
           <div className="text-sm">
             <a
-              href="#"
+              href="/forgot-password"
               className="font-medium text-blue-600 hover:text-blue-500"
+              // onClick={() => dispatch(setNavigationPath("/forgot-password"))}
             >
               Forgot your password?
             </a>

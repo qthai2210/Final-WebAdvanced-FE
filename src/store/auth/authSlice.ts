@@ -1,7 +1,8 @@
 import { publicAxios, axiosInstance } from "@/lib/axios";
 import { UserRole } from "@/types/Enums/User.enum";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
+import { connectSocket, disconnectSocket } from "@/lib/socket";
+import { authService } from "@/services/auth.service";
 import { toast } from "react-toastify";
 
 interface AuthState {
@@ -13,6 +14,9 @@ interface AuthState {
   error: string | null;
   navigationPath: string | null; // Add this
   role: UserRole | null; // Add this
+  forgotPasswordLoading: boolean;
+  verifyOTPLoading: boolean;
+  resetPasswordLoading: boolean;
 }
 
 const initialState: AuthState = {
@@ -24,6 +28,9 @@ const initialState: AuthState = {
   error: null,
   navigationPath: null, // Add this
   role: null, // Add this
+  forgotPasswordLoading: false,
+  verifyOTPLoading: false,
+  resetPasswordLoading: false,
 };
 
 export interface RegisterDto {
@@ -50,10 +57,14 @@ export const login = createAsyncThunk(
         password,
       });
       const data = response.data.data;
-      console.log(data);
-      // Store tokens immediately
+
       localStorage.setItem("accessToken", data.access_token);
       localStorage.setItem("refreshToken", data.refresh_token);
+
+      // Connect socket with a slight delay to ensure auth state is updated
+      setTimeout(() => {
+        connectSocket(data.user.username);
+      }, 500);
 
       return data;
     } catch (error: any) {
@@ -189,6 +200,7 @@ export const autoLogin = createAsyncThunk(
       if (!verifyResult.isValid) {
         if (!verifyResult.isExpired) {
           // Token is invalid but not expired, try refresh
+          console.log("autoLogin -> refreshToken");
           const refreshResult = await dispatch(refreshToken()).unwrap();
           if (refreshResult) {
             const response = await axiosInstance.post("/auth/relogin");
@@ -204,6 +216,61 @@ export const autoLogin = createAsyncThunk(
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       return rejectWithValue(error.message || "Auto login failed");
+    }
+  }
+);
+
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async (email: string, { rejectWithValue }) => {
+    try {
+      await authService.forgotPassword(email);
+      toast.success("Password reset instructions sent to your email");
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to send reset instructions"
+      );
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const verifyOTPForgotPassword = createAsyncThunk(
+  "auth/verifyOTP",
+  async (
+    { email, otp }: { email: string; otp: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      await authService.verifyOTPForgotPassword(email, otp);
+      toast.success("OTP verified successfully");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Invalid OTP");
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async (
+    {
+      email,
+      newPassword,
+      confirmPassword,
+    }: {
+      email: string;
+      newPassword: string;
+      confirmPassword: string;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      await authService.resetPassword(email, newPassword, confirmPassword);
+      toast.success("Password reset successfully");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to reset password");
+      return rejectWithValue(error.response?.data?.message);
     }
   }
 );
@@ -233,6 +300,10 @@ const authSlice = createSlice({
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
         state.role = action.payload.user.role; // Add this
+
+        // Connect socket after successful login
+        connectSocket(action.payload.user.id);
+
         console.log("autoLogin -> action.payload", action.payload);
         if (action.payload.user.role === UserRole.CUSTOMER) {
           state.navigationPath = "/dashboard";
@@ -302,6 +373,10 @@ const authSlice = createSlice({
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
         state.role = action.payload.user.role; // Add this
+
+        // Connect socket after successful auto login
+        connectSocket(action.payload.user.id);
+
         // check role and redirect to the correct path
         console.log("autoLogin -> action.payload", action.payload);
         if (action.payload.user.role === UserRole.CUSTOMER) {
@@ -326,6 +401,10 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.loading = false;
         state.role = null; // Add this
+
+        // Disconnect socket on logout
+        disconnectSocket();
+
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         state.navigationPath = "/login";
@@ -341,6 +420,44 @@ const authSlice = createSlice({
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         window.location.href = "/login";
+      })
+      // Forgot Password
+      .addCase(forgotPassword.pending, (state) => {
+        state.forgotPasswordLoading = true;
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.forgotPasswordLoading = false;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.forgotPasswordLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // Verify OTP
+      .addCase(verifyOTPForgotPassword.pending, (state) => {
+        state.verifyOTPLoading = true;
+        state.error = null;
+      })
+      .addCase(verifyOTPForgotPassword.fulfilled, (state) => {
+        state.verifyOTPLoading = false;
+      })
+      .addCase(verifyOTPForgotPassword.rejected, (state, action) => {
+        state.verifyOTPLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // Reset Password
+      .addCase(resetPassword.pending, (state) => {
+        state.resetPasswordLoading = true;
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.resetPasswordLoading = false;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.resetPasswordLoading = false;
+        state.error = action.payload as string;
       });
   },
 });
