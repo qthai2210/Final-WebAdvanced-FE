@@ -9,7 +9,7 @@ import TransferPage from "@/pages/TransferPage";
 import RecipientListPage from "@/pages/RecipientListPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
-import { RecipientsListPage } from "@/pages/RecipientsListPage";
+// import { RecipientsListPage } from "@/pages/RecipientsListPage";
 
 export const UserRoutes: RouteObject[] = [
   {
@@ -44,14 +44,14 @@ export const UserRoutes: RouteObject[] = [
           </ProtectedRoute>
         ),
       },
-      {
-        path: "/recipients",
-        element: (
-          <ProtectedRoute>
-            <RecipientsListPage />
-          </ProtectedRoute>
-        ),
-      },
+      // {
+      //   path: "/recipients",
+      //   element: (
+      //     <ProtectedRoute>
+      //       <RecipientsListPage />
+      //     </ProtectedRoute>
+      //   ),
+      // },
       {
         path: "transactions",
         element: (
