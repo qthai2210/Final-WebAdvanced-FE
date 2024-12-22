@@ -4,9 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "./ui/button";
 import InputField from "./InputField";
 import { LoginDto } from "../types/LoginDto";
-import { autoLogin, login } from "../store/auth/authSlice";
+import { autoLogin, login, loginWithCaptcha } from "../store/auth/authSlice";
 import type { AppDispatch, RootState } from "../store/store";
 import { useNavigate } from "react-router-dom";
+import ReCAPTCHA from "react-google-recaptcha";
+import { toast } from "react-toastify";
 
 interface LoginFormData extends LoginDto {
   remember_me?: boolean;
@@ -23,6 +25,10 @@ const LoginForm: React.FC = () => {
       remember_me: false,
     },
   });
+  const navigate = useNavigate();
+  const [recaptchaToken, setRecaptchaToken] = React.useState<string | null>(
+    localStorage.getItem("recaptchaToken") || null
+  );
 
   console.log("AuthProvider");
   React.useEffect(() => {
@@ -31,14 +37,31 @@ const LoginForm: React.FC = () => {
       dispatch(autoLogin());
       navigate("/dashboard", { replace: true });
     }
-  }, [dispatch]);
-  const navigate = useNavigate();
+  }, [dispatch, navigate]);
+
+  const onRecaptchaChange = (recaptchaToken: string | null) => {
+    setRecaptchaToken(recaptchaToken);
+  };
+
   const onSubmit = async (data: LoginFormData) => {
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA verification.");
+      return;
+    } else {
+      localStorage.setItem("recaptchaToken", recaptchaToken);
+    }
+
     try {
       await dispatch(
-        login({
+        // recaptchaToken !== null
+        //   ? login({
+        //       username: data.username,
+        //       password: data.password,
+        //     })
+        loginWithCaptcha({
           username: data.username,
           password: data.password,
+          recaptchaToken,
         })
       ).unwrap();
       // check if the user is authenticated and redirect to the dashboard
@@ -112,6 +135,13 @@ const LoginForm: React.FC = () => {
             </a>
           </div>
         </div>
+        {/* {recaptchaToken === null && ( */}
+        <ReCAPTCHA
+          sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+          onChange={onRecaptchaChange}
+          className="mt-2 w-full"
+        />
+        {/* )} */}
         <div>
           <Button
             type="submit"

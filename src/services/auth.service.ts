@@ -1,5 +1,5 @@
 import { RegisterDto } from "../types/RegisterDto";
-import { LoginDto } from "../types/LoginDto";
+import { LoginDto, LoginWithRecaptchaDto } from "../types/LoginDto";
 import axiosInstance from "../lib/axios";
 
 interface AuthResponse {
@@ -11,6 +11,16 @@ export const authService = {
   login: async (data: LoginDto): Promise<AuthResponse> => {
     const response = await axiosInstance.post<AuthResponse>(
       "/auth/login",
+      data
+    );
+    return response.data;
+  },
+
+  loginWithCaptcha: async (
+    data: LoginWithRecaptchaDto
+  ): Promise<AuthResponse> => {
+    const response = await axiosInstance.post<AuthResponse>(
+      "/auth/login/secure",
       data
     );
     return response.data;

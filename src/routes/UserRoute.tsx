@@ -5,6 +5,7 @@ import Layout from "../components/Layout";
 import ProtectedRoute from "./ProtectedRoute";
 import CreateDebtPage from "@/pages/CreateDebtPage";
 import { DebtManagementPage } from "@/pages/DebtManagementPage";
+import { RecipientsListPage } from "@/pages/RecipientsListPage";
 
 export const UserRoutes: RouteObject[] = [
   {
@@ -20,6 +21,14 @@ export const UserRoutes: RouteObject[] = [
         element: (
           <ProtectedRoute>
             <DashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/recipients",
+        element: (
+          <ProtectedRoute>
+            <RecipientsListPage />
           </ProtectedRoute>
         ),
       },

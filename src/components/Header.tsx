@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { logout, setNavigationPath } from "../store/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import { getUserAccounts } from "@/store/account/accountSlice";
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -15,6 +16,7 @@ const Header: React.FC = () => {
   const { isAuthenticated, username } = useSelector(
     (state: RootState) => state.auth
   );
+  const { account } = useSelector((state: RootState) => state.account);
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -32,11 +34,13 @@ const Header: React.FC = () => {
 
   const handleLogout = async () => {
     await dispatch(logout());
+    dispatch(getUserAccounts());
     navigate("/login");
   };
 
   const handleNavigation = (path: string) => {
     dispatch(setNavigationPath(path));
+    dispatch(getUserAccounts());
   };
 
   return (
@@ -56,6 +60,13 @@ const Header: React.FC = () => {
               onClick={() => handleNavigation("/dashboard")}
             >
               Dashboard
+            </Link>
+            <Link
+              to="/recipients"
+              className="text-gray-700 hover:text-blue-600"
+              onClick={() => handleNavigation("/recipients")}
+            >
+              Recipients List
             </Link>
             <Link
               to="/transactions"
@@ -92,7 +103,9 @@ const Header: React.FC = () => {
             {/* Quick Balance */}
             <div className="text-sm">
               <span className="text-gray-500">Balance:</span>
-              <span className="ml-2 font-semibold">$12,345.67</span>
+              <span className="ml-2 font-semibold">
+                ${account?.balance || 0}
+              </span>
             </div>
 
             {/* Notifications */}
@@ -193,7 +206,9 @@ const Header: React.FC = () => {
             <div className="px-3 py-2">
               <div className="text-sm">
                 <span className="text-gray-500">Balance:</span>
-                <span className="ml-2 font-semibold">$12,345.67</span>
+                <span className="ml-2 font-semibold">
+                  ${account?.balance || 0}
+                </span>
               </div>
             </div>
           </div>
