@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { FaTrash, FaEdit } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { fetchEmployees, deleteEmployee } from "@/store/admin/adminSlice";
@@ -8,14 +7,26 @@ import { UpdateEmployeeDialog } from "./UpdateEmployeeDialog";
 
 export default function StaffManagement() {
   const dispatch = useDispatch<AppDispatch>();
-  const { employees, loading, error } = useSelector(
-    (state: RootState) => state.admin
-  );
+  const {
+    data: employees = [],
+    loading,
+    error,
+  } = useSelector((state: RootState) => {
+    console.log("State in selector:", state.admin.employees); // Debug log
+    return state.admin.employees;
+  });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
   useEffect(() => {
-    dispatch(fetchEmployees());
+    const fetchData = async () => {
+      try {
+        await dispatch(fetchEmployees()).unwrap();
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+    fetchData();
   }, [dispatch]);
 
   const handleDeleteStaff = async (id: string) => {
@@ -34,6 +45,8 @@ export default function StaffManagement() {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
+  if (!employees || employees.length === 0)
+    return <div>No employees found</div>;
 
   return (
     <div>
@@ -57,38 +70,43 @@ export default function StaffManagement() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {employees.map((member) => (
-              <tr key={member.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {member.username}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{member.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{member.role}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => handleDeleteStaff(member.id)}
-                    className="text-red-600 hover:text-red-900 mr-3"
-                  >
-                    <FaTrash />
-                  </button>
-                  <button
-                    onClick={() => handleEditClick(member)}
-                    className="text-blue-600 hover:text-blue-900"
-                  >
-                    <FaEdit />
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {Array.isArray(employees) &&
+              employees.map((member) => (
+                <tr key={member._id || member.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {member.fullName || member.username}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {member.email}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{member.role}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={() => handleDeleteStaff(member.id)}
+                      className="text-red-600 hover:text-red-900 mr-3"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => handleEditClick(member)}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
 
-      <UpdateEmployeeDialog
-        employee={editingEmployee}
-        isOpen={isEditModalOpen}
-        onClose={handleCloseDialog}
-      />
+      {editingEmployee && (
+        <UpdateEmployeeDialog
+          employee={editingEmployee}
+          isOpen={isEditModalOpen}
+          onClose={handleCloseDialog}
+        />
+      )}
     </div>
   );
 }

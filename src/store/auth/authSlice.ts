@@ -12,8 +12,8 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
-  navigationPath: string | null; // Add this
-  role: UserRole | null; // Add this
+  navigationPath: string | null;
+  role: UserRole | null;
   forgotPasswordLoading: boolean;
   verifyOTPLoading: boolean;
   resetPasswordLoading: boolean;
@@ -26,8 +26,8 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
-  navigationPath: null, // Add this
-  role: null, // Add this
+  navigationPath: null,
+  role: null,
   forgotPasswordLoading: false,
   verifyOTPLoading: false,
   resetPasswordLoading: false,
