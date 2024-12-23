@@ -29,3 +29,24 @@ export interface Employee {
 export interface UpdateEmployeeDto extends Partial<CreateEmployeeDto> {
   status?: UserStatus;
 }
+
+export interface PaginatedMetadata {
+  total: number;
+  page: number;
+  lastPage: number;
+  limit: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  metadata: PaginatedMetadata;
+}
+
+export interface EmployeeFilter {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  sortBy?: "createdAt" | "username" | "email" | "fullName";
+  sortOrder?: "asc" | "desc";
+}

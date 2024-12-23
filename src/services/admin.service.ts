@@ -3,6 +3,8 @@ import {
   CreateEmployeeDto,
   Employee,
   UpdateEmployeeDto,
+  EmployeeFilter,
+  PaginatedResponse,
 } from "@/types/admin.types";
 
 export const adminService = {
@@ -12,9 +14,57 @@ export const adminService = {
     return response.data;
   },
 
-  getAllEmployees: async (): Promise<Employee[]> => {
-    const response = await axiosInstance.get("/admin/employees");
-    return response.data;
+  getAllEmployees: async (
+    filters?: EmployeeFilter
+  ): Promise<PaginatedResponse<Employee>> => {
+    try {
+      // Build query parameters
+      const queryParams = new URLSearchParams();
+
+      if (filters) {
+        if (filters.page) queryParams.append("page", filters.page.toString());
+        if (filters.limit)
+          queryParams.append("limit", filters.limit.toString());
+        if (filters.search) queryParams.append("search", filters.search);
+        if (filters.status) queryParams.append("status", filters.status);
+        if (filters.sortBy) queryParams.append("sortBy", filters.sortBy);
+        if (filters.sortOrder)
+          queryParams.append("sortOrder", filters.sortOrder);
+      }
+
+      const response = await axiosInstance.get(
+        `/admin/employees?${queryParams.toString()}`
+      );
+
+      console.log("API Raw Response:", response.data);
+
+      // Handle nested data structure
+      if (response.data && response.data.data) {
+        return {
+          data: response.data.data.data || [],
+          metadata: response.data.data.metadata || {
+            total: 0,
+            page: 1,
+            lastPage: 1,
+            limit: 10,
+          },
+        };
+      }
+
+      // Return empty state if no valid data
+      return {
+        data: [],
+        metadata: {
+          total: 0,
+          page: 1,
+          lastPage: 1,
+          limit: 10,
+        },
+      };
+    } catch (error) {
+      console.error("Error in getAllEmployees:", error);
+      throw error;
+    }
   },
 
   getEmployeeById: async (id: string): Promise<Employee> => {
