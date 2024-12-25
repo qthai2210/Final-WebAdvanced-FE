@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Box, Tab, Tabs, Button } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Box,
+  Tab,
+  Tabs,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import {
@@ -49,7 +57,11 @@ export const DebtManagementPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        <CircularProgress /> Loading...
+      </div>
+    );
   }
 
   return (

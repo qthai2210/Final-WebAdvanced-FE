@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { toast } from "react-toastify";
 import { autoLogin } from "../store/auth/authSlice";
+import { CircularProgress } from "@mui/material";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -64,7 +65,11 @@ export default function ProtectedRoute({
   }, [isAuthenticated, roles, role, navigate]);
 
   if (loading) {
-    return <div>Loading...</div>; // Or your loading component
+    return (
+      <div>
+        <CircularProgress /> Loading...
+      </div>
+    ); // Or your loading component
   }
 
   if (!isAuthenticated) {

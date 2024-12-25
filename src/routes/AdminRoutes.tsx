@@ -1,8 +1,8 @@
 import { RouteObject } from "react-router-dom";
-
-import { AdminLayout } from "@/components/admin/AdminLayout";
+import { AdminLayout } from "@/layouts/AdminLayout"; // Update this import path
 import StaffManagement from "@/components/admin/StaffManagement";
 import ProtectedRoute from "./ProtectedRoute";
+import { EmployeeList } from "@/pages/admin/EmployeeList";
 
 export const AdminRoutes: RouteObject[] = [
   {
@@ -24,7 +24,7 @@ export const AdminRoutes: RouteObject[] = [
           },
           {
             path: "employees",
-            element: <StaffManagement />,
+            element: <EmployeeList />,
           },
           {
             path: "users",
