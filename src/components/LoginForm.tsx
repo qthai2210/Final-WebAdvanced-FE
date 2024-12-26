@@ -57,7 +57,7 @@ const LoginForm: React.FC = () => {
         //   ? login({
         //       username: data.username,
         //       password: data.password,
-        //     })
+        //     }) :
         loginWithCaptcha({
           username: data.username,
           password: data.password,

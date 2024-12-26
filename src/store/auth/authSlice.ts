@@ -4,6 +4,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
 import { authService } from "@/services/auth.service";
 import { toast } from "react-toastify";
+import { ChangePasswordDto } from "@/types/user.types";
 
 interface AuthState {
   username: any | null;
@@ -12,8 +13,9 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
-  navigationPath: string | null;
-  role: UserRole | null;
+  navigationPath: string | null; // Add this
+  role: UserRole | null; // Add this
+  changePasswordLoading: boolean;
   forgotPasswordLoading: boolean;
   verifyOTPLoading: boolean;
   resetPasswordLoading: boolean;
@@ -26,8 +28,9 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
-  navigationPath: null,
-  role: null,
+  navigationPath: null, // Add this
+  role: null, // Add this
+  changePasswordLoading: false,
   forgotPasswordLoading: false,
   verifyOTPLoading: false,
   resetPasswordLoading: false,
@@ -220,6 +223,20 @@ export const autoLogin = createAsyncThunk(
   }
 );
 
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async (changePasswordData: ChangePasswordDto, { rejectWithValue }) => {
+    try {
+      const response = await authService.changePassword(changePasswordData);
+      toast.success("Change password successfully");
+      return response;
+    } catch (error: any) {
+      // toast.error(error.response?.data?.message || "Failed to change password");
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
 export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async (email: string, { rejectWithValue }) => {
@@ -318,10 +335,10 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
       // Login with reCAPTCHA
-      // .addCase(login.pending, (state) => {
-      //   state.loading = true;
-      //   state.error = null;
-      // })
+      .addCase(loginWithCaptcha.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(loginWithCaptcha.fulfilled, (state, action) => {
         state.loading = false;
         state.isAuthenticated = true;
@@ -339,10 +356,10 @@ const authSlice = createSlice({
           state.navigationPath = "/admin";
         }
       })
-      // .addCase(login.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error = action.payload as string;
-      // })
+      .addCase(loginWithCaptcha.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
       // Register
       .addCase(register.pending, (state) => {
         state.loading = true;
@@ -420,6 +437,18 @@ const authSlice = createSlice({
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         window.location.href = "/login";
+      })
+      // Change Password
+      .addCase(changePassword.pending, (state) => {
+        state.changePasswordLoading = true;
+        state.error = null;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.changePasswordLoading = false;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.changePasswordLoading = false;
+        state.error = action.payload as string;
       })
       // Forgot Password
       .addCase(forgotPassword.pending, (state) => {

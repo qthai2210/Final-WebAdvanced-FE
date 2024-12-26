@@ -20,3 +20,9 @@ export interface RegisterWithoutPasswordDto {
   address?: string;
   role?: UserRole;
 }
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}

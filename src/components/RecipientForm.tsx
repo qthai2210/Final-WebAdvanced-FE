@@ -82,7 +82,8 @@ const RecipientForm: React.FC<RecipientFormProps> = ({
                 initialData ? "bg-gray-100" : ""
               }`}
               readOnly={initialData !== null}
-              placeholder="Enter account number"
+              placeholder="Enter account number with exactly 10 digits"
+              maxLength={10}
             />
             {initialData && (
               <p className="text-sm text-gray-500 mt-1">

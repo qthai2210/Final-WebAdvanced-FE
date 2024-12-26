@@ -99,13 +99,6 @@ const Header: React.FC = () => {
               Dashboard
             </Link>
             <Link
-              to="/recipients"
-              className="text-gray-700 hover:text-blue-600"
-              onClick={() => handleNavigation("/recipients")}
-            >
-              Recipients List
-            </Link>
-            <Link
               to="/transactions"
               className="text-gray-700 hover:text-blue-600"
               onClick={() => handleNavigation("/transactions")}
@@ -220,19 +213,27 @@ const Header: React.FC = () => {
                     Welcome, {username}
                   </div>
                   {isAuthenticated ? (
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                    >
-                      Logout
-                    </button>
+                    <div>
+                      <div className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <Link
+                          to="/change-password"
+                          onClick={() => handleNavigation("/change-password")}
+                        >
+                          Change password
+                        </Link>
+                      </div>
+
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      >
+                        Logout
+                      </button>
+                    </div>
                   ) : (
-                    <Link
-                      to="/login"
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Login
-                    </Link>
+                    <div className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <Link to="/login">Login</Link>
+                    </div>
                   )}
                 </div>
               )}
