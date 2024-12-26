@@ -1,13 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { SavedRecipient } from "@/types/recipient.types";
-import {
-  updateRecipient,
-  removeRecipient,
-} from "@/store/recipient/recipientSlice";
+import { removeRecipient } from "@/store/recipient/recipientSlice";
 import { AppDispatch } from "@/store/store";
 import { setNavigationPath } from "@/store/auth/authSlice";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 interface RecipientListProps {
   recipients?: SavedRecipient[];
@@ -19,22 +18,16 @@ const RecipientList: React.FC<RecipientListProps> = ({
   onEdit,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-
-  const handleDelete = async (e: React.MouseEvent, accountNumber: string) => {
-    e.stopPropagation(); // Prevent triggering the parent click
-    if (window.confirm("Are you sure you want to delete this recipient?")) {
-      try {
-        await dispatch(removeRecipient(accountNumber)).unwrap();
-      } catch (error) {
-        console.error("Failed to delete recipient:", error);
-      }
-    }
-  };
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedAccountNumber, setSelectedAccountNumber] = useState<
+    string | null
+  >(null);
 
   const handleEdit = (e: React.MouseEvent, recipient: SavedRecipient) => {
     e.stopPropagation(); // Prevent triggering the parent click
-    onEdit && onEdit(recipient);
+    if (onEdit) {
+      onEdit(recipient);
+    }
   };
 
   const handleRecipientClick = (accountNumber: string) => {
@@ -42,6 +35,24 @@ const RecipientList: React.FC<RecipientListProps> = ({
       setNavigationPath(`/transactions/internal?accountNumber=${accountNumber}`)
     );
     //navigate(`/transactions/internal?accountNumber=${accountNumber}`);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, accountNumber: string) => {
+    e.stopPropagation(); // Prevent triggering the parent click
+    setSelectedAccountNumber(accountNumber);
+    setIsConfirmOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (selectedAccountNumber) {
+      try {
+        await dispatch(removeRecipient(selectedAccountNumber)).unwrap();
+        setIsConfirmOpen(false);
+        setSelectedAccountNumber(null);
+      } catch (error) {
+        console.error("Failed to delete recipient:", error);
+      }
+    }
   };
 
   if (!recipients || recipients.length === 0) {
@@ -66,18 +77,26 @@ const RecipientList: React.FC<RecipientListProps> = ({
                 onClick={(e) => handleEdit(e, recipient)}
                 className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
               >
-                Edit
+                <EditIcon fontSize="small" />
               </button>
             )}
             <button
-              onClick={(e) => handleDelete(e, recipient.accountNumber)}
+              onClick={(e) => handleDeleteClick(e, recipient.accountNumber)}
               className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
             >
-              Delete
+              <DeleteIcon fontSize="small" />
             </button>
           </div>
         </div>
       ))}
+
+      <ConfirmDialog
+        open={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleDelete}
+        title="Confirm Delete"
+        message="Are you sure you want to delete this recipient?"
+      />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { RegisterDto } from "../types/RegisterDto";
 import { LoginDto, LoginWithRecaptchaDto } from "../types/LoginDto";
 import axiosInstance from "../lib/axios";
+import { ChangePasswordDto } from "@/types/user.types";
 
 interface AuthResponse {
   accessToken: string;
@@ -43,6 +44,11 @@ export const authService = {
 
   logout: () => {
     localStorage.removeItem("token");
+  },
+
+  changePassword: async (data: ChangePasswordDto) => {
+    const response = await axiosInstance.post("/auth/change-password", data);
+    return response.data;
   },
 
   forgotPassword: async (email: string) => {

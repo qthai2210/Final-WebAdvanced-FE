@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchSavedRecipients,
@@ -10,6 +10,7 @@ import { Recipient, RecipientDto } from "@/types/recipient.types";
 import { AppDispatch, RootState } from "@/store/store";
 import RecipientForm from "../components/RecipientForm";
 import { setNavigationPath } from "@/store/auth/authSlice";
+import { CircularProgress } from "@mui/material";
 
 const RecipientListPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -50,7 +51,9 @@ const RecipientListPage = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div>Loading...</div>
+        <div>
+          <CircularProgress /> Loading...
+        </div>
       </div>
     );
   }

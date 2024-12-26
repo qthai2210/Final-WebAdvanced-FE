@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit"; // Import icon chỉnh sửa
+import EditIcon from "@mui/icons-material/Edit";
 
 interface RecipientDetailCardProps {
   recipient: {

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
+import { CircularProgress } from "@mui/material";
 
 export function EmployeeList() {
   const dispatch = useDispatch<AppDispatch>();
@@ -29,7 +30,9 @@ export function EmployeeList() {
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div>Loading...</div>
+          <div>
+            <CircularProgress /> Loading...
+          </div>
         ) : (
           <Table>
             <TableHeader>

@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
 import { Outlet, useNavigate } from "react-router-dom";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const Layout: React.FC = () => {
   const { username, isAuthenticated, navigationPath } = useSelector(
@@ -27,11 +28,12 @@ const Layout: React.FC = () => {
   }, [isAuthenticated, username]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="flex-grow max-w-7xl mx-auto w-full py-6 sm:px-6 lg:px-8">
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 };
