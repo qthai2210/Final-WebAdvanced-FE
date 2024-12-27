@@ -9,6 +9,7 @@ interface CreateTransactionDto {
   amount: number;
   content: string;
   feeType: "sender" | "receiver";
+  bankId?: string;
 }
 
 interface TransactionHistory {
@@ -56,6 +57,14 @@ class TransactionService {
     const response = await axiosInstance.get("/transactions/history", {
       params: query,
     });
+    return response.data;
+  }
+
+  async initiateExternalTransfer(transferData: TransactionFormData) {
+    const response = await axiosInstance.post(
+      "/transactions/external-transfer",
+      transferData
+    );
     return response.data;
   }
 }

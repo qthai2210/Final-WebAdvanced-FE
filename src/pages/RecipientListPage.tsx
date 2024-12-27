@@ -77,7 +77,7 @@ const RecipientListPage = () => {
           Internal Transfer
         </button>
         <button
-          onClick={() => setIsFormOpen(true)}
+          onClick={() => dispatch(setNavigationPath("/transactions/external"))}
           className="px-4 py-2 bg-blue-500 text-white rounded"
         >
           External Transfer

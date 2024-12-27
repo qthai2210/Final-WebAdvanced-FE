@@ -51,6 +51,24 @@ export const confirmTransfer = createAsyncThunk(
   }
 );
 
+export const initiateExternalTransfer = createAsyncThunk(
+  "transaction/initiateExternalTransfer",
+  async (transferData: TransactionFormData, { rejectWithValue }) => {
+    try {
+      const response = await transactionService.initiateExternalTransfer(
+        transferData
+      );
+      toast.success("Transfer initiated. Please check your email for OTP");
+      return response;
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to initiate transfer"
+      );
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
 const transactionSlice = createSlice({
   name: "transaction",
   initialState,
@@ -75,6 +93,18 @@ const transactionSlice = createSlice({
       })
       .addCase(confirmTransfer.fulfilled, (state) => {
         state.currentTransfer = null;
+      })
+      .addCase(initiateExternalTransfer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(initiateExternalTransfer.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentTransfer = action.payload;
+      })
+      .addCase(initiateExternalTransfer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

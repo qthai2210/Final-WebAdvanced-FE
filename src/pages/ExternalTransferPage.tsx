@@ -3,40 +3,36 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { AppDispatch, RootState } from "@/store/store";
 import {
-  initiateTransfer,
   confirmTransfer,
+  initiateExternalTransfer,
 } from "@/store/transaction/transactionSlice";
 import { TransactionFormData } from "@/types/transaction.types";
 import { toast } from "react-toastify";
 import SourceAccountSelector from "../components/transfer/SourceAccountSelector";
-import RecipientSelector from "../components/transfer/RecipientSelector";
+import BankSelector from "../components/transfer/BankSelector"; // You'll need to create this component
 import TransferDetails from "../components/transfer/TransferDetails";
 import FeePaymentMethod from "../components/transfer/FeePaymentMethod";
 import OTPConfirmation from "../components/transfer/OTPConfirmation";
-import SaveRecipientPrompt from "../components/transfer/SaveRecipientPrompt";
 import { setNavigationPath } from "@/store/auth/authSlice";
 
-const TransferPage = () => {
+const ExternalTransferPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { currentTransfer, loading } = useSelector(
     (state: RootState) => state.transaction
   );
   const [formData, setFormData] = useState<TransactionFormData>({
     toAccount: "",
+    bankId: "123", // New field for bank selection
     amount: 0,
     content: "",
     feeType: "sender",
   });
   const [showOTP, setShowOTP] = useState(false);
-  const [showSavePrompt, setShowSavePrompt] = useState(false);
   const [searchParams] = useSearchParams();
-  const [accountNumber, setAccountNumber] = useState<string>("");
-  const [isExistingRecipient, setIsExistingRecipient] = useState(false);
 
   useEffect(() => {
     const accountFromUrl = searchParams.get("accountNumber");
     if (accountFromUrl) {
-      setAccountNumber(accountFromUrl);
       setFormData((prev) => ({ ...prev, toAccount: accountFromUrl }));
     }
   }, [searchParams]);
@@ -48,7 +44,11 @@ const TransferPage = () => {
         return;
       }
 
-      const result = await dispatch(initiateTransfer(formData)).unwrap();
+      const result = await dispatch(
+        initiateExternalTransfer({
+          ...formData, // Specify that this is an external transfer
+        })
+      ).unwrap();
       if (result) {
         setShowOTP(true);
       }
@@ -59,9 +59,7 @@ const TransferPage = () => {
 
   const handleOTPConfirm = async (otp: string) => {
     try {
-      console.log("currentTransfer", currentTransfer);
       if (!currentTransfer?._id) {
-        console.log("No active transfer found");
         toast.error("No active transfer found");
         return;
       }
@@ -70,29 +68,30 @@ const TransferPage = () => {
         confirmTransfer({
           transactionId: currentTransfer._id.toString(),
           otp,
+          type: "external",
         })
       ).unwrap();
 
       toast.success("Transfer completed successfully");
       setShowOTP(false);
-
-      if (isExistingRecipient) {
-        dispatch(setNavigationPath("/dashboard"));
-      } else {
-        setShowSavePrompt(true);
-      }
+      dispatch(setNavigationPath("/dashboard"));
     } catch (error: any) {
       toast.error(error.message || "Failed to confirm transfer");
     }
   };
 
   const isFormValid = () => {
-    return formData.toAccount && formData.amount > 0 && formData.content;
+    return (
+      formData.toAccount &&
+      formData.amount > 0 &&
+      formData.content &&
+      formData.bankId
+    );
   };
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-6">
-      <h1 className="text-2xl font-bold mb-6">Transfer Money</h1>
+      <h1 className="text-2xl font-bold mb-6">Interbank Transfer</h1>
 
       <SourceAccountSelector
         onSelect={(account) =>
@@ -100,16 +99,24 @@ const TransferPage = () => {
         }
       />
 
-      <RecipientSelector
-        accountNumber={accountNumber}
-        onSelect={(recipient) => {
-          setFormData((prev) => ({
-            ...prev,
-            toAccount: recipient.accountNumber,
-          }));
-          setIsExistingRecipient(recipient.isRecipient);
-        }}
+      <BankSelector
+        onSelect={(bankCode) => setFormData((prev) => ({ ...prev, bankCode }))}
       />
+
+      <div className="space-y-4">
+        <label className="block">
+          <span className="text-gray-700">Recipient Account Number</span>
+          <input
+            type="text"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            value={formData.toAccount}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, toAccount: e.target.value }))
+            }
+            placeholder="Enter account number"
+          />
+        </label>
+      </div>
 
       <TransferDetails
         onChange={(details) => setFormData((prev) => ({ ...prev, ...details }))}
@@ -133,20 +140,8 @@ const TransferPage = () => {
           onCancel={() => setShowOTP(false)}
         />
       )}
-
-      {showSavePrompt && !isExistingRecipient && (
-        <SaveRecipientPrompt
-          recipient={{
-            accountNumber: formData.toAccount,
-          }}
-          onClose={() => {
-            setShowSavePrompt(false);
-            dispatch(setNavigationPath("/dashboard"));
-          }}
-        />
-      )}
     </div>
   );
 };
 
-export default TransferPage;
+export default ExternalTransferPage;
