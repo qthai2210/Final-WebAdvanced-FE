@@ -16,7 +16,7 @@ import OTPConfirmation from "../components/transfer/OTPConfirmation";
 import SaveRecipientPrompt from "../components/transfer/SaveRecipientPrompt";
 import { setNavigationPath } from "@/store/auth/authSlice";
 
-const TransferPage = () => {
+const InternalTransferPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { currentTransfer, loading } = useSelector(
     (state: RootState) => state.transaction
@@ -70,6 +70,7 @@ const TransferPage = () => {
         confirmTransfer({
           transactionId: currentTransfer._id.toString(),
           otp,
+          type: "internal",
         })
       ).unwrap();
 
@@ -149,4 +150,4 @@ const TransferPage = () => {
   );
 };
 
-export default TransferPage;
+export default InternalTransferPage;

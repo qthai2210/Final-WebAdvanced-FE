@@ -5,11 +5,12 @@ import Layout from "../components/Layout";
 import ProtectedRoute from "./ProtectedRoute";
 import CreateDebtPage from "@/pages/CreateDebtPage";
 import { DebtManagementPage } from "@/pages/DebtManagementPage";
-import TransferPage from "@/pages/TransferPage";
 import RecipientListPage from "@/pages/RecipientListPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import ChangePasswordPage from "@/pages/ChangePasswordPage";
+import InternalTransferPage from "@/pages/InternalTransferPage";
+import ExternalTransferPage from "@/pages/ExternalTransferPage";
 
 export const UserRoutes: RouteObject[] = [
   {
@@ -44,7 +45,15 @@ export const UserRoutes: RouteObject[] = [
         path: "transactions/internal",
         element: (
           <ProtectedRoute>
-            <TransferPage />
+            <InternalTransferPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "transactions/external",
+        element: (
+          <ProtectedRoute>
+            <ExternalTransferPage />
           </ProtectedRoute>
         ),
       },

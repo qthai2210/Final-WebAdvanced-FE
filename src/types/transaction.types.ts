@@ -3,11 +3,13 @@ export interface TransactionFormData {
   amount: number;
   content: string;
   feeType: "sender" | "receiver";
+  bankId?: string;
 }
 
 export interface TransactionOtpData {
   transactionId: string;
   otp: string;
+  type: "internal" | "external";
 }
 
 export interface TransactionResponse {
