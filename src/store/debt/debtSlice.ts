@@ -3,8 +3,10 @@ import { toast } from "react-toastify";
 import { debtService } from "@/services/debt.service";
 import {
   DebtSummary,
-  PayDebtData,
   SendPaymentOtpData,
+  CancelDebtDto,
+  PayDebtDto,
+  SendPaymentOtpDto,
 } from "@/types/debt.types";
 
 interface DebtState {
@@ -86,29 +88,44 @@ export const fetchDebtSummary = createAsyncThunk(
   }
 );
 
-export const payDebt = createAsyncThunk(
-  "debt/payDebt",
-  async (paymentData: PayDebtData, { rejectWithValue }) => {
+export const sendPaymentOtp = createAsyncThunk(
+  "debt/sendPaymentOtp",
+  async (data: SendPaymentOtpDto, { rejectWithValue }) => {
     try {
-      const response = await debtService.payDebt(paymentData);
-      toast.success("Payment successful");
-      return response.data;
+      const response = await debtService.sendPaymentOtp(data);
+      toast.success("OTP sent successfully");
+      return response;
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Payment failed");
+      toast.error(error.response?.data?.message || "Failed to send OTP");
       return rejectWithValue(error.response?.data?.message);
     }
   }
 );
 
-export const sendPaymentOtp = createAsyncThunk(
-  "debt/sendPaymentOtp",
-  async (otpData: SendPaymentOtpData, { rejectWithValue }) => {
+export const cancelDebt = createAsyncThunk(
+  "debt/cancelDebt",
+  async (cancelData: CancelDebtDto, { rejectWithValue }) => {
     try {
-      const response = await debtService.sendPaymentOtp(otpData);
-      toast.success("OTP sent successfully");
-      return response.data;
+      console.log("Cancel debt data:", cancelData); // Add this for debugging
+      const response = await debtService.cancelDebt(cancelData);
+      toast.success("Debt cancelled successfully");
+      return response;
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to send OTP");
+      toast.error(error.response?.data?.message || "Failed to cancel debt");
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const payDebt = createAsyncThunk(
+  "debt/payDebt",
+  async (data: PayDebtDto, { rejectWithValue }) => {
+    try {
+      const response = await debtService.payDebt(data);
+      toast.success("Debt paid successfully");
+      return response;
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to pay debt");
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -161,14 +178,35 @@ const debtSlice = createSlice({
       .addCase(fetchDebtSummary.fulfilled, (state, action) => {
         state.summary = action.payload;
       })
+      // Cancel Debt
+      .addCase(cancelDebt.fulfilled, (state, action) => {
+        const cancelledDebt = action.payload;
+
+        // Check and update in created debts
+        const createdDebtIndex = state.createdDebts.findIndex(
+          (debt) => debt._id === cancelledDebt._id
+        );
+        if (createdDebtIndex !== -1) {
+          state.createdDebts[createdDebtIndex] = cancelledDebt;
+          return; // Exit early if found in created debts
+        }
+
+        // If not found in created debts, check and update in received debts
+        const receivedDebtIndex = state.debts.findIndex(
+          (debt) => debt._id === cancelledDebt._id
+        );
+        if (receivedDebtIndex !== -1) {
+          state.debts[receivedDebtIndex] = cancelledDebt;
+        }
+      })
       // Pay Debt
       .addCase(payDebt.fulfilled, (state, action) => {
-        const updatedDebt = action.payload;
+        const paidDebt = action.payload;
         const index = state.debts.findIndex(
-          (debt) => debt.id === updatedDebt.id
+          (debt) => debt._id === paidDebt._id
         );
         if (index !== -1) {
-          state.debts[index] = updatedDebt;
+          state.debts[index] = paidDebt;
         }
       });
   },

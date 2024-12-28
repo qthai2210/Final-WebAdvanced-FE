@@ -21,11 +21,20 @@ export interface DebtSummary {
   receivedDebts: DebtDetail[];
 }
 
-export interface PayDebtData {
+export interface SendPaymentOtpData {
+  debtId: string;
+}
+
+export interface CancelDebtDto {
+  debtId: string;
+  cancelReason: string;
+}
+
+export interface PayDebtDto {
   debtId: string;
   otp: string;
 }
 
-export interface SendPaymentOtpData {
+export interface SendPaymentOtpDto {
   debtId: string;
 }
