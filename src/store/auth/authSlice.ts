@@ -386,7 +386,8 @@ const authSlice = createSlice({
       .addCase(autoLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.isAuthenticated = true;
-        state.username = action.payload.username;
+        console.log("autoLogin -> action.payload", action.payload);
+        state.username = action.payload.user.username;
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
         state.role = action.payload.user.role; // Add this

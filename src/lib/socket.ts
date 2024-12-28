@@ -2,6 +2,13 @@ import { toast } from "react-toastify";
 import { io, Socket } from "socket.io-client";
 import { addNotification } from "@/store/notifications/notificationSlice";
 import { store } from "@/store/store";
+import { getUserAccounts } from "@/store/account/accountSlice";
+import {
+  fetchCreatedDebts,
+  fetchDebts,
+  fetchDebtSummary,
+  getReceivedDebts,
+} from "@/store/debt/debtSlice";
 
 interface Notification {
   _id: string;
@@ -15,6 +22,16 @@ interface Notification {
 }
 
 let socket: Socket | null = null;
+
+// Add type for debt-related notifications
+const DEBT_NOTIFICATIONS = [
+  "DEBT_CREATED",
+  "DEBT_PAID",
+  "DEBT_REMINDER",
+  "DEBT_OVERDUE",
+  "DEBT_CANCELLED",
+  "DEBT_PAYMENT",
+];
 
 export const connectSocket = (userId: string) => {
   if (!socket) {
@@ -65,6 +82,19 @@ export const connectSocket = (userId: string) => {
 
       // Dispatch to store
       store.dispatch(addNotification(cleanNotification));
+
+      // Check if it's a debt-related notification
+      if (DEBT_NOTIFICATIONS.includes(notification.type)) {
+        // For payment notifications, update account balance
+        if (notification.type === "DEBT_PAYMENT") {
+          store.dispatch(getUserAccounts());
+        }
+
+        // Update debt-related data
+        store.dispatch(fetchDebts());
+        store.dispatch(fetchCreatedDebts());
+        store.dispatch(fetchDebtSummary());
+      }
 
       // Map notification types to toast types
       const toastTypeMap: {
