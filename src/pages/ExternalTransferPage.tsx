@@ -22,13 +22,14 @@ const ExternalTransferPage = () => {
   );
   const [formData, setFormData] = useState<TransactionFormData>({
     toAccount: "",
-    bankId: "123", // New field for bank selection
+    bankId: "676fb538732f63c359d59d03", // New field for bank selection
     amount: 0,
     content: "",
     feeType: "sender",
   });
   const [showOTP, setShowOTP] = useState(false);
   const [searchParams] = useSearchParams();
+  const [transactionId, setTransactionId] = useState<string>("");
 
   useEffect(() => {
     const accountFromUrl = searchParams.get("accountNumber");
@@ -46,11 +47,16 @@ const ExternalTransferPage = () => {
 
       const result = await dispatch(
         initiateExternalTransfer({
-          ...formData, // Specify that this is an external transfer
+          ...formData,
         })
       ).unwrap();
-      if (result) {
+
+      if (result?.transactionId) {
+        // Thay đổi từ result?._id thành result?.transactionId
+        setTransactionId(result.transactionId);
         setShowOTP(true);
+      } else {
+        toast.error("Failed to create transfer");
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to initiate transfer");
@@ -59,14 +65,14 @@ const ExternalTransferPage = () => {
 
   const handleOTPConfirm = async (otp: string) => {
     try {
-      if (!currentTransfer?._id) {
-        toast.error("No active transfer found");
+      if (!transactionId) {
+        toast.error("No transaction ID found");
         return;
       }
 
       await dispatch(
         confirmTransfer({
-          transactionId: currentTransfer._id.toString(),
+          transactionId: transactionId,
           otp,
           type: "external",
         })
