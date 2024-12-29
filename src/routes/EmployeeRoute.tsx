@@ -29,6 +29,15 @@ export const EmployeeRoutes: RouteObject[] = [
         path: "settings",
         // element: <AdminSettings />
       },
+      {
+        path: "transaction/history",
+        // element: (
+        //   <ProtectedRoute>
+
+        //   </ProtectedRoute>
+        // )
+
+      }
     ],
   },
 ];
