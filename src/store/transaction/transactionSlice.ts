@@ -7,11 +7,11 @@ import {
 import {
   TransactionFormData,
   TransactionOtpData,
-  TransactionResponse,
 } from "@/types/transaction.types";
+import { Transaction } from "@/types/transaction";
 
 interface TransactionState {
-  transactions: TransactionResponse[];
+  transactions: Transaction[];
   currentTransfer: any | null;
   loading: boolean;
   error: string | null;
