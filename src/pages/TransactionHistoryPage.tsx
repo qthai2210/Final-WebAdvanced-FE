@@ -1,37 +1,11 @@
 import React from "react";
 import TransactionItem from "@/components/dashboard/TransactionItem";
-import { getUserAccounts } from "@/store/account/accountSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/store/store";
-import { getMyTransactions } from "@/store/transaction/transactionSlice";
-import { Transaction } from "@/types/transaction";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 const TransactionHistoryPage = () => {
-  const [transactions, setTransactions] = React.useState<Transaction[]>([]);
   const [transactionType, setTransactionType] = React.useState("all");
-  const { account } = useSelector((state: RootState) => state.account);
-  const dispatch = useDispatch<AppDispatch>();
-
-  const getTransactions = async (accountNumber: string) => {
-    const fetchedTransactions = await dispatch(
-      getMyTransactions({
-        accountNumber,
-        type: "all",
-        limit: 1000,
-      })
-    ).unwrap();
-    setTransactions(fetchedTransactions);
-  };
-
-  React.useEffect(() => {
-    dispatch(getUserAccounts());
-  }, [dispatch]);
-
-  React.useEffect(() => {
-    if (account?.accountNumber) {
-      getTransactions(account.accountNumber);
-    }
-  }, [account?.accountNumber]);
+  const { transactions } = useSelector((state: RootState) => state.transaction);
 
   const filteredTransactions =
     transactionType === "all"
