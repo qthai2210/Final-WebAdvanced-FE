@@ -17,6 +17,7 @@ const DashboardPage: React.FC = () => {
       getMyTransactions({
         accountNumber,
         type: "all",
+        limit: 1000,
       })
     ).unwrap();
 
