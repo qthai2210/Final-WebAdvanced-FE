@@ -1,7 +1,7 @@
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { fetchUserAccounts } from "@/store/account/accountSlice";
+import { useEffect } from "react";
 
 interface Props {
   onSelect: (accountNumber: string) => void;
