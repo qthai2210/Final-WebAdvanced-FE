@@ -7,19 +7,7 @@ import {
   fetchCreatedDebts,
   fetchDebts,
   fetchDebtSummary,
-  getReceivedDebts,
 } from "@/store/debt/debtSlice";
-
-interface Notification {
-  _id: string;
-  userId: string;
-  content: string;
-  type: string;
-  relatedId: string;
-  isRead: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
 
 let socket: Socket | null = null;
 

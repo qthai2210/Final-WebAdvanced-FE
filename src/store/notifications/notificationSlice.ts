@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { notificationService } from "@/services/notification.service";
-import { toast } from "react-toastify";
 
 export interface Notification {
   _id: string;
@@ -121,44 +120,53 @@ const notificationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchNotifications.fulfilled, (state, action) => {
-        // Add null check and ensure we have an array
-        const notifications = Array.isArray(action.payload)
-          ? action.payload
-          : [];
-        state.notifications = notifications;
-        state.unreadCount = notifications.filter(
-          (n: Notification) => !n.isRead
-        ).length;
-      })
-      .addCase(fetchUnreadCount.fulfilled, (state, action) => {
-        console.log(action.payload);
-        // Ensure we're getting a number
-        state.unreadCount =
-          typeof action.payload === "number" ? action.payload : 0;
-      })
-      .addCase(markNotificationAsRead.fulfilled, (state, action) => {
-        const notification = state.notifications.find(
-          (n) => n._id === action.payload
-        );
-        if (notification && !notification.isRead) {
-          notification.isRead = true;
-          state.unreadCount -= 1;
+      .addCase(
+        fetchNotifications.fulfilled,
+        (state, action: PayloadAction<Notification[]>) => {
+          // Add null check and ensure we have an array
+          const notifications = Array.isArray(action.payload)
+            ? action.payload
+            : [];
+          state.notifications = notifications;
+          state.unreadCount = notifications.filter(
+            (n: Notification) => !n.isRead
+          ).length;
         }
-      })
+      )
+      .addCase(
+        fetchUnreadCount.fulfilled,
+        (state, action: PayloadAction<number>) => {
+          console.log(action.payload);
+          // Ensure we're getting a number
+          state.unreadCount =
+            typeof action.payload === "number" ? action.payload : 0;
+        }
+      )
+      .addCase(
+        markNotificationAsRead.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          const notification = state.notifications.find(
+            (n) => n._id === action.payload
+          );
+          if (notification && !notification.isRead) {
+            notification.isRead = true;
+            state.unreadCount -= 1;
+          }
+        }
+      )
       .addCase(markAllNotificationsAsRead.fulfilled, (state) => {
         state.notifications.forEach((n) => {
           n.isRead = true;
         });
         state.unreadCount = 0;
-      })
-      // Error handling
-      .addMatcher(
-        (action) => action.type.endsWith("/rejected"),
-        (_, action) => {
-          toast.error(action.payload || "An error occurred");
-        }
-      );
+      });
+    // Error handling
+    // .addMatcher(
+    //   (action) => action.type.endsWith("/rejected"),
+    //   (_, action) => {
+    //     toast.error(action.payload || "An error occurred");
+    //   }
+    // );
   },
 });
 
