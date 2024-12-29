@@ -28,7 +28,8 @@ const SourceAccountSelector: React.FC<Props> = ({ onSelect }) => {
         <option value="">Select account</option>
         {accounts.map((account) => (
           <option key={account._id} value={account.accountNumber}>
-            {account.accountNumber} - Balance: ${account.balance}
+            {account.accountNumber} - Balance: $
+            {new Intl.NumberFormat().format(account.balance)}
           </option>
         ))}
       </select>
