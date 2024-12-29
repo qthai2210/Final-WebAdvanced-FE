@@ -11,6 +11,7 @@ import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import ChangePasswordPage from "@/pages/ChangePasswordPage";
 import InternalTransferPage from "@/pages/InternalTransferPage";
 import ExternalTransferPage from "@/pages/ExternalTransferPage";
+import TransactionHistoryPage from "@/pages/TransactionHistoryPage";
 
 export const UserRoutes: RouteObject[] = [
   {
@@ -74,6 +75,14 @@ export const UserRoutes: RouteObject[] = [
         //     ),
         //   },
         // ],
+      },
+      {
+        path: "history",
+        element: (
+          <ProtectedRoute>
+            <TransactionHistoryPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "payments",

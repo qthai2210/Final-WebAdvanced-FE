@@ -29,7 +29,11 @@ const QuickActions: React.FC = () => {
       />
       <QuickActionButton icon={<CreditCard />} label="Pay Bills" />
       <QuickActionButton icon={<Plus />} label="Add Money" />
-      <QuickActionButton icon={<History />} label="History" />
+      <QuickActionButton
+        icon={<History />}
+        label="History"
+        onClick={() => dispatch(setNavigationPath("/history"))}
+      />
     </div>
   );
 };
