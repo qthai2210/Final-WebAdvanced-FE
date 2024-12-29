@@ -46,7 +46,7 @@ const CustomerOverview: React.FC = () => {
         <div className="text-right">
           <p className="text-sm text-gray-600">Available Balance</p>
           <p className="text-3xl font-bold text-blue-600">
-            ${account?.balance}
+            ${new Intl.NumberFormat().format(account?.balance)}
           </p>
         </div>
       </div>
