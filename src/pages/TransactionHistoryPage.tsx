@@ -2,10 +2,13 @@ import React from "react";
 import TransactionItem from "@/components/dashboard/TransactionItem";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { CircularProgress } from "@mui/material";
 
 const TransactionHistoryPage = () => {
   const [transactionType, setTransactionType] = React.useState("all");
-  const { transactions } = useSelector((state: RootState) => state.transaction);
+  const { transactions, loading } = useSelector(
+    (state: RootState) => state.transaction
+  );
 
   const filteredTransactions =
     transactionType === "all"
@@ -13,6 +16,13 @@ const TransactionHistoryPage = () => {
       : transactions.filter(
           (transaction) => transaction.type === transactionType
         );
+
+  if (loading)
+    return (
+      <div>
+        <CircularProgress /> Loading History...
+      </div>
+    );
 
   return (
     <div className="text-center">
