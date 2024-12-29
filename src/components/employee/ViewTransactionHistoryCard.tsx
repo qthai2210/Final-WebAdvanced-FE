@@ -100,7 +100,7 @@ export function ViewTransactionHistoryCard() {
 
         {transactionHistories.length > 0 && (
           <div className="mt-4">
-            <h3 className="text-lg font-bold">Transaction History:</h3>
+            <h3 className="text-lg font-bold my-6">Transaction History:</h3>
             <ul className="space-y-2">
               {transactionHistories.map((item) => (
                 <li key={item._id}>

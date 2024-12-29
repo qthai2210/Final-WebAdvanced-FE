@@ -1,17 +1,13 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { TransactionItem } from "@/types/transaction.types";
 import { format } from "date-fns";
-import { X } from "lucide-react"; // Add this import
 
 export function TransactionHistoryItem(props: TransactionItem) {
 
