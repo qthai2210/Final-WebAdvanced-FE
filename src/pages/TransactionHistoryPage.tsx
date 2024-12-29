@@ -17,6 +17,7 @@ const TransactionHistoryPage = () => {
       getMyTransactions({
         accountNumber,
         type: "all",
+        limit: 1000,
       })
     ).unwrap();
     setTransactions(fetchedTransactions);
