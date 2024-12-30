@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { employeeService } from "@/services/employee.service";
 import { RegisterWithoutPasswordDto } from "@/types/user.types";
-import { TransactionHistoryQueryDto } from "@/types/transaction.types";
+import { DepositMoneyCreateDto, TransactionHistoryQueryDto } from "@/types/transaction.types";
 
 interface CustomerState {
   customers: any[];
@@ -79,6 +79,19 @@ export const fetchTransactionHistory = createAsyncThunk(
   }
 );
 
+export const depositMoney = createAsyncThunk(
+  'employee/deposit-money',
+  async (depositData: DepositMoneyCreateDto, { rejectWithValue }) => {
+    try {
+      const response = await employeeService.depositMoney(depositData);
+      console.log(response)
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'An error occurred while depositing money.');
+    }
+  }
+);
+
 const employeeSlice = createSlice({
   name: "employee",
   initialState,
@@ -126,7 +139,19 @@ const employeeSlice = createSlice({
       .addCase(fetchTransactionHistory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      });
+      })
+      .addCase(depositMoney.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(depositMoney.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(depositMoney.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
   },
 });
 
