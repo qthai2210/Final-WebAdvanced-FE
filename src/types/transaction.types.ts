@@ -54,3 +54,9 @@ export interface TransactionItem {
     fullName: string;
   }];
 }
+
+export interface DepositMoneyCreateDto {
+  accountNumber?: string;
+  username?: string;
+  amount: number;
+}
