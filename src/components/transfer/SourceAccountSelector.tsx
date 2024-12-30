@@ -1,11 +1,15 @@
-import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/store";
+import { AppDispatch, RootState } from "@/store/store";
 import { fetchUserAccounts } from "@/store/account/accountSlice";
+import { useEffect } from "react";
 
 interface Props {
   onSelect: (accountNumber: string) => void;
 }
+
+// interface Account {
+//   // Define account properties
+// }
 
 const SourceAccountSelector: React.FC<Props> = ({ onSelect }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -16,6 +20,10 @@ const SourceAccountSelector: React.FC<Props> = ({ onSelect }) => {
   useEffect(() => {
     dispatch(fetchUserAccounts());
   }, [dispatch]);
+
+  // const handleAccountSelect = (account: Account) => {
+  //   // Your implementation
+  // };
 
   return (
     <div className="space-y-2">

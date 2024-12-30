@@ -72,7 +72,7 @@ export default function StaffManagement() {
           <tbody className="bg-white divide-y divide-gray-200">
             {Array.isArray(employees) &&
               employees.map((member) => (
-                <tr key={member._id || member.id} className="hover:bg-gray-50">
+                <tr key={member.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     {member.fullName || member.username}
                   </td>

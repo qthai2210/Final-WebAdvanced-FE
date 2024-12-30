@@ -10,16 +10,13 @@ import { TransactionItem } from "@/types/transaction.types";
 import { format } from "date-fns";
 
 export function TransactionHistoryItem(props: TransactionItem) {
-
-  const {amount, createdAt, status, fromUser, toUser, content } = props;
+  const { amount, createdAt, status, fromUser, toUser, content } = props;
 
   return (
     <Card
       className={`mb-4 hover:shadow-lg transition-all duration-300 border-l-4`}
     >
-      <CardHeader
-        className={`bg-gradient-to-r to-white`}
-      >
+      <CardHeader className={`bg-gradient-to-r to-white`}>
         <div className="flex justify-between items-start">
           <div>
             <CardTitle
@@ -34,7 +31,9 @@ export function TransactionHistoryItem(props: TransactionItem) {
               </span>
             </CardDescription>
           </div>
-          <div className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase transform hover:scale-105 transition-all duration-200`}>
+          <div
+            className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase transform hover:scale-105 transition-all duration-200`}
+          >
             {status}
           </div>
         </div>

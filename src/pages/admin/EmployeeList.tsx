@@ -95,13 +95,13 @@ export function EmployeeList() {
     setFilters((prev) => ({ ...prev, page }));
   };
 
-  const handleEditClick = (employee: any) => {
-    // Handle edit click
-  };
+  // const handleEditClick = (employee: any) => {
+  //   // Handle edit click
+  // };
 
-  const handleDeleteStaff = (id: string) => {
-    // Handle delete click
-  };
+  // const handleDeleteStaff = (id: string) => {
+  //   // Handle delete click
+  // };
 
   return (
     <div className="space-y-4">
@@ -240,7 +240,7 @@ export function EmployeeList() {
                       <PaginationItem>
                         <PaginationPrevious
                           onClick={() => handlePageChange(metadata.page - 1)}
-                          disabled={metadata.page === 1}
+                          //disabled={metadata.page === 1}
                         />
                       </PaginationItem>
                       {Array.from(
@@ -259,7 +259,7 @@ export function EmployeeList() {
                       <PaginationItem>
                         <PaginationNext
                           onClick={() => handlePageChange(metadata.page + 1)}
-                          disabled={metadata.page === metadata.lastPage}
+                          // disabled={metadata.page === metadata.lastPage}
                         />
                       </PaginationItem>
                     </PaginationContent>

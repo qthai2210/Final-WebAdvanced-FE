@@ -38,3 +38,9 @@ export interface PayDebtDto {
 export interface SendPaymentOtpDto {
   debtId: string;
 }
+
+export interface TransactionOtpData {
+  transactionId: string;
+  otp: string;
+  type: string;
+}

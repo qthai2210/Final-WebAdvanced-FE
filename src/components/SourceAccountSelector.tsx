@@ -1,5 +1,3 @@
-import React from "react";
-
 const SourceAccountSelector = () => {
   // Mock data for source accounts
   const accounts = [

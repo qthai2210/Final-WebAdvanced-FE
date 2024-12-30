@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import { debtService } from "@/services/debt.service";
 import {
   DebtSummary,
-  SendPaymentOtpData,
   CancelDebtDto,
   PayDebtDto,
   SendPaymentOtpDto,

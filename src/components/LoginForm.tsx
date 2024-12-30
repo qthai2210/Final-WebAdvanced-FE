@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "./ui/button";
 import InputField from "./InputField";
 import { LoginDto } from "../types/LoginDto";
-import { autoLogin, login, loginWithCaptcha } from "../store/auth/authSlice";
+import { autoLogin, loginWithCaptcha } from "../store/auth/authSlice";
 import type { AppDispatch, RootState } from "../store/store";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";

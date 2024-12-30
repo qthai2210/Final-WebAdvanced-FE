@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const FeePaymentMethod = () => {
   const [feeMethod, setFeeMethod] = useState("sender");
