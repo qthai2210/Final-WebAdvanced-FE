@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 interface OTPConfirmationProps {
   onConfirm: (otp: string) => void;
@@ -11,44 +12,44 @@ const OTPConfirmation: React.FC<OTPConfirmationProps> = ({
 }) => {
   const [otp, setOtp] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log(otp);
-    onConfirm(otp);
-  };
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg max-w-md w-full">
-        <h2 className="text-xl font-bold mb-4">Enter OTP</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-md relative shadow-xl transform transition-all">
+        <button
+          onClick={onCancel}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+        >
+          <XMarkIcon className="h-6 w-6" />
+        </button>
+
+        <h2 className="text-xl font-semibold mb-4">Enter OTP Code</h2>
         <p className="text-gray-600 mb-4">
-          Please enter the OTP sent to your registered mobile number
+          Please enter the OTP code sent to your phone number
         </p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            placeholder="Enter OTP"
-            className="w-full p-2 border rounded"
-            maxLength={6}
-          />
-          <div className="flex space-x-4">
-            <button
-              type="submit"
-              className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-            >
-              Confirm
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex-1 bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+
+        <input
+          type="text"
+          className="w-full px-4 py-2 text-center text-2xl tracking-widest border rounded-lg mb-4 focus:border-blue-500 focus:ring-blue-500"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          maxLength={6}
+          placeholder="000000"
+        />
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => onConfirm(otp)}
+            className="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={onCancel}
+            className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );

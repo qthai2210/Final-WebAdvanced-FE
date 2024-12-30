@@ -1,3 +1,4 @@
+import { XMarkIcon, UserPlusIcon, UserIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 import { Recipient, RecipientDto } from "@/types/recipient.types";
 import { useDispatch } from "react-redux";
@@ -57,34 +58,46 @@ const RecipientForm: React.FC<RecipientFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">
-          {initialData ? "Edit Recipient" : "Add New Recipient"}
-        </h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl transform transition-all">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <UserPlusIcon className="h-6 w-6 text-blue-500" />
+            <h2 className="text-xl font-semibold text-gray-800">
+              {initialData ? "Edit Recipient" : "Add New Recipient"}
+            </h2>
+          </div>
+          <button
+            onClick={onCancel}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <XMarkIcon className="h-5 w-5" />
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
               Account Number
             </label>
-            <input
-              type="text"
-              value={formData.accountNumber}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  accountNumber: e.target.value,
-                }))
-              }
-              onBlur={handleAccountBlur}
-              className={`w-full p-2 border rounded ${
-                initialData ? "bg-gray-100" : ""
-              }`}
-              readOnly={initialData !== null}
-              placeholder="Enter account number with exactly 10 digits"
-              maxLength={10}
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={formData.accountNumber}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    accountNumber: e.target.value,
+                  }))
+                }
+                onBlur={handleAccountBlur}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="Enter account number with exactly 10 digits"
+                maxLength={10}
+                readOnly={initialData !== null}
+              />
+              <UserIcon className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            </div>
             {initialData && (
               <p className="text-sm text-gray-500 mt-1">
                 Account number cannot be changed
@@ -92,34 +105,38 @@ const RecipientForm: React.FC<RecipientFormProps> = ({
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Nickname</label>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Nickname
+            </label>
             <input
               type="text"
               value={formData.nickname}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, nickname: e.target.value }))
               }
-              className="w-full p-2 border rounded"
-              placeholder="Enter nickname"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="Enter a nickname"
+              required
             />
           </div>
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          <div className="flex justify-end gap-2">
+          <div className="flex gap-3 pt-4">
+            <button
+              type="submit"
+              className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+            >
+              <UserPlusIcon className="h-5 w-5" />
+              {initialData ? "Update" : "Add"} Recipient
+            </button>
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-gray-600 border rounded"
+              className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              {initialData ? "Update" : "Save"}
             </button>
           </div>
         </form>
