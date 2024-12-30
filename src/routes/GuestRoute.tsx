@@ -3,13 +3,13 @@ import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import LoginPage from "@/pages/LoginPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import WelcomePage from "@/pages/WelcomePage";
-import GuestLayout from "@/components/GuestLayout";
+import GuestLayout from "@/components/GuestLayout"; // Fixed import
 import { RouteObject } from "react-router-dom";
 
 export const GuestRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <GuestLayout />,
+    element: <GuestLayout />, // Using the correct GuestLayout component
     children: [
       {
         index: true,

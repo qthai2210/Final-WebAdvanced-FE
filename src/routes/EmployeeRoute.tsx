@@ -1,48 +1,43 @@
 import { RouteObject } from "react-router-dom";
-import Layout from "../components/Layout";
-import StaffManagement from "@/components/admin/StaffManagement";
-import { EmployeeDashboard } from "@/pages/employee/Dashboard";
+import EmployeeLayout from "@/components/EmployeeLayout";
 import ProtectedRoute from "./ProtectedRoute";
-import { ViewTransactionHistoryCard } from "@/components/employee/ViewTransactionHistoryCard";
-import { DepositMoneyIntoUserAccount } from "@/components/employee/DepositMoneyIntoUserAccount";
+import { EmployeeDashboard } from "@/pages/employee/Dashboard";
+import { CreateCustomerPage } from "@/pages/employee/CreateCustomer";
+import { TransactionHistoryPage } from "@/pages/employee/TransactionHistory";
 
 export const EmployeeRoutes: RouteObject[] = [
   {
     path: "/employee",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <EmployeeLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
-        index: true,
-        element: (
-          <ProtectedRoute>
-            <EmployeeDashboard />
-          </ProtectedRoute>
-        ),
+        path: "dashboard",
+        element: <EmployeeDashboard></EmployeeDashboard>, // Replace with actual components
       },
       {
-        path: "staff",
-        element: <StaffManagement />,
-      },
-      {
-        path: "users",
-        // element: <UserManagement />
-      },
-      {
-        path: "settings",
-        // element: <AdminSettings />
+        path: "create-customer",
+        element: <CreateCustomerPage></CreateCustomerPage>,
       },
       {
         path: "transaction-history",
-        element: (
-          <ViewTransactionHistoryCard />
-        )
+        element: <TransactionHistoryPage></TransactionHistoryPage>,
       },
       {
-        path: "deposit-money",
-        element: (
-          <DepositMoneyIntoUserAccount />
-        )
-      }
+        path: "reports",
+        element: <div>Reports</div>,
+      },
+      {
+        path: "transaction/history",
+        // element: (
+        //   <ProtectedRoute>
+
+        //   </ProtectedRoute>
+        // )
+      },
     ],
   },
 ];

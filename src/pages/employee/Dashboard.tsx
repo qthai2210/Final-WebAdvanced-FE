@@ -1,4 +1,3 @@
-import { UserCreationForm } from "@/components/employee/UserCreationForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 
@@ -23,9 +22,6 @@ export function EmployeeDashboard() {
             <CardContent>{/* Add activity list here */}</CardContent>
           </Card>
         </div>
-
-        <UserCreationForm />
-        {/* onClick={dispatch(setNavigationPath("employee/transaction/history"))} */}
       </div>
     </Container>
   );

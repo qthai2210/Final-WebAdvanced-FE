@@ -1,43 +1,38 @@
-import * as React from "react";
+import { Input } from "@/components/ui/input";
 import { useFormContext } from "react-hook-form";
+import { Label } from "@/components/ui/label";
 
 interface InputFieldProps {
   name: string;
   label: string;
   type?: string;
-  rules?: {
-    required?: string | boolean;
-    minLength?: { value: number; message: string };
-    maxLength?: { value: number; message: string };
-    pattern?: { value: RegExp; message: string };
-  };
+  rules?: object;
+  className?: string;
 }
 
-const InputField: React.FC<InputFieldProps> = ({
+const InputField = ({
   name,
   label,
   type = "text",
   rules,
-}) => {
+  className,
+}: InputFieldProps) => {
   const {
     register,
     formState: { errors },
   } = useFormContext();
 
   return (
-    <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <input
+    <div className="space-y-2">
+      <Label htmlFor={name}>{label}</Label>
+      <Input
         id={name}
-        {...register(name, rules)}
         type={type}
-        className={`w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 
-          ${errors[name] ? "border-red-500" : "border-gray-300"}`}
+        {...register(name, rules)}
+        className={className}
       />
       {errors[name] && (
-        <p className="mt-1 text-sm text-red-600">
+        <p className="text-sm text-red-500">
           {errors[name]?.message as string}
         </p>
       )}
