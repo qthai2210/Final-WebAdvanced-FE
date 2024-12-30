@@ -15,6 +15,7 @@ import FeePaymentMethod from "../components/transfer/FeePaymentMethod";
 import OTPConfirmation from "../components/transfer/OTPConfirmation";
 import SaveRecipientPrompt from "../components/transfer/SaveRecipientPrompt";
 import { setNavigationPath } from "@/store/auth/authSlice";
+import { UserGroupIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 
 const InternalTransferPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -92,41 +93,65 @@ const InternalTransferPage = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
-      <h1 className="text-2xl font-bold mb-6">Transfer Money</h1>
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <div className="flex items-center gap-3 mb-8">
+        <UserGroupIcon className="h-8 w-8 text-green-500" />
+        <h1 className="text-2xl font-bold text-gray-800">Internal Transfer</h1>
+      </div>
 
-      <SourceAccountSelector
-        onSelect={(account) =>
-          setFormData((prev) => ({ ...prev, fromAccount: account }))
-        }
-      />
+      <div className="space-y-6">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <SourceAccountSelector
+            onSelect={(account) =>
+              setFormData((prev) => ({ ...prev, fromAccount: account }))
+            }
+          />
+        </div>
 
-      <RecipientSelector
-        accountNumber={accountNumber}
-        onSelect={(recipient) => {
-          setFormData((prev) => ({
-            ...prev,
-            toAccount: recipient.accountNumber,
-          }));
-          setIsExistingRecipient(recipient.isRecipient);
-        }}
-      />
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <RecipientSelector
+            accountNumber={accountNumber}
+            onSelect={(recipient) => {
+              setFormData((prev) => ({
+                ...prev,
+                toAccount: recipient.accountNumber,
+              }));
+              setIsExistingRecipient(recipient.isRecipient);
+            }}
+          />
+        </div>
 
-      <TransferDetails
-        onChange={(details) => setFormData((prev) => ({ ...prev, ...details }))}
-      />
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <TransferDetails
+            onChange={(details) =>
+              setFormData((prev) => ({ ...prev, ...details }))
+            }
+          />
+        </div>
 
-      <FeePaymentMethod
-        onChange={(feeType) => setFormData((prev) => ({ ...prev, feeType }))}
-      />
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <FeePaymentMethod
+            onChange={(feeType) =>
+              setFormData((prev) => ({ ...prev, feeType }))
+            }
+          />
+        </div>
 
-      <button
-        onClick={handleTransfer}
-        disabled={loading || !isFormValid()}
-        className="w-full py-2 px-4 bg-blue-500 text-white rounded disabled:bg-gray-300"
-      >
-        {loading ? "Processing..." : "Transfer"}
-      </button>
+        <button
+          onClick={handleTransfer}
+          disabled={loading || !isFormValid()}
+          className="w-full py-3 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <>
+              <ArrowPathIcon className="h-5 w-5 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            "Transfer"
+          )}
+        </button>
+      </div>
 
       {showOTP && (
         <OTPConfirmation

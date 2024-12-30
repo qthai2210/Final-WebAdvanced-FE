@@ -4,9 +4,8 @@ import { SavedRecipient } from "@/types/recipient.types";
 import { removeRecipient } from "@/store/recipient/recipientSlice";
 import { AppDispatch } from "@/store/store";
 import { setNavigationPath } from "@/store/auth/authSlice";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { UserIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 interface RecipientListProps {
   recipients?: SavedRecipient[];
@@ -56,7 +55,12 @@ const RecipientList: React.FC<RecipientListProps> = ({
   };
 
   if (!recipients || recipients.length === 0) {
-    return <div className="text-center py-4">No recipients found</div>;
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <UserIcon className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+        <p>No recipients found</p>
+      </div>
+    );
   }
 
   return (
@@ -65,26 +69,35 @@ const RecipientList: React.FC<RecipientListProps> = ({
         <div
           key={recipient.id}
           onClick={() => handleRecipientClick(recipient.accountNumber)}
-          className="flex justify-between items-center p-4 bg-white rounded-lg shadow hover:bg-gray-50 cursor-pointer"
+          className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all cursor-pointer border border-gray-200"
         >
-          <div>
-            <h3 className="font-medium">{recipient.nickname}</h3>
-            <p className="text-sm text-gray-600">{recipient.accountNumber}</p>
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-100 p-2 rounded-full">
+              <UserIcon className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">
+                {recipient.nickname}
+              </h3>
+              <p className="text-sm text-gray-600">{recipient.accountNumber}</p>
+            </div>
           </div>
           <div className="flex gap-2">
             {onEdit && (
               <button
                 onClick={(e) => handleEdit(e, recipient)}
-                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
+                title="Edit recipient"
               >
-                <EditIcon fontSize="small" />
+                <PencilIcon className="h-5 w-5" />
               </button>
             )}
             <button
               onClick={(e) => handleDeleteClick(e, recipient.accountNumber)}
-              className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+              className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
+              title="Delete recipient"
             >
-              <DeleteIcon fontSize="small" />
+              <TrashIcon className="h-5 w-5" />
             </button>
           </div>
         </div>
@@ -94,8 +107,8 @@ const RecipientList: React.FC<RecipientListProps> = ({
         open={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={handleDelete}
-        title="Confirm Delete"
-        message="Are you sure you want to delete this recipient?"
+        title="Delete Recipient"
+        message="Are you sure you want to remove this recipient from your list?"
       />
     </div>
   );
