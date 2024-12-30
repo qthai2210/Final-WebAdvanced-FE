@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { AppDispatch } from "@/store/store";
 import { useDispatch } from "react-redux";
 import { setNavigationPath } from "@/store/auth/authSlice";

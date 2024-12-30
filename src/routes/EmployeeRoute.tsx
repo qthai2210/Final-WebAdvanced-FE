@@ -4,9 +4,6 @@ import ProtectedRoute from "./ProtectedRoute";
 import { EmployeeDashboard } from "@/pages/employee/Dashboard";
 import { CreateCustomerPage } from "@/pages/employee/CreateCustomer";
 import { TransactionHistoryPage } from "@/pages/employee/TransactionHistory";
-import ProtectedRoute from "./ProtectedRoute";
-import { ViewTransactionHistoryCard } from "@/components/employee/ViewTransactionHistoryCard";
-import { DepositMoneyIntoUserAccount } from "@/components/employee/DepositMoneyIntoUserAccount";
 
 export const EmployeeRoutes: RouteObject[] = [
   {
