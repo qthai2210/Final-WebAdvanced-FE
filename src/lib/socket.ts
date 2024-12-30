@@ -20,10 +20,11 @@ const DEBT_NOTIFICATIONS = [
   "DEBT_CANCELLED",
   "DEBT_PAYMENT",
 ];
+const baseURL = import.meta.env.VITE_API_URL;
 
 export const connectSocket = (userId: string) => {
   if (!socket) {
-    socket = io("http://localhost:4000", {
+    socket = io(baseURL, {
       query: { userId },
       reconnection: true,
       reconnectionAttempts: 5,
