@@ -56,6 +56,7 @@ axiosInstance.interceptors.response.use(
             window.location.href = "/login";
           }
         } catch (error) {
+          console.error("Error verifying token:", error);
           store.dispatch(logout());
           window.location.href = "/login";
         }

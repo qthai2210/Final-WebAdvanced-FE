@@ -25,6 +25,7 @@ export function EmployeeDashboard() {
         </div>
 
         <UserCreationForm />
+        {/* onClick={dispatch(setNavigationPath("employee/transaction/history"))} */}
       </div>
     </Container>
   );

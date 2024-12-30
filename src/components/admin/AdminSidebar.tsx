@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { UserPlus, Users, Home, Settings, LogOut } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { AppDispatch } from "@/store/store";
 import { useDispatch } from "react-redux";
 import { logout, setNavigationPath } from "@/store/auth/authSlice";
@@ -41,7 +41,7 @@ const menuItems = [
 ];
 
 export function AdminSidebar() {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
   const { isExpanded, setIsExpanded } = useSidebar();

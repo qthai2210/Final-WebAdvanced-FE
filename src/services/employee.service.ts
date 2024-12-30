@@ -1,3 +1,4 @@
+import { DepositMoneyCreateDto, TransactionHistoryQueryDto } from "@/types/transaction.types";
 import { axiosInstance } from "../lib/axios";
 import { RegisterWithoutPasswordDto, UserRole } from "@/types/user.types";
 
@@ -37,4 +38,15 @@ export const employeeService = {
     });
     return response.data;
   },
+
+  async getTransactionHistory(query: TransactionHistoryQueryDto) {
+    const response = await axiosInstance.get("/employee/user-transaction-history", { params: query });
+    return response.data;
+  },
+
+  async depositMoney(data: DepositMoneyCreateDto) {
+    console.log(data)
+    const response = await axiosInstance.post("/employee/deposit-money", data);
+    return response;
+  }
 };

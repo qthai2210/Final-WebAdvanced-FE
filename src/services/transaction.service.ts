@@ -12,7 +12,7 @@ interface CreateTransactionDto {
   bankId?: string;
 }
 
-interface TransactionHistory {
+export interface TransactionHistory {
   accountNumber: string;
   type?: "all" | "received" | "sent" | "debt_payment";
   page?: number;

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { connectSocket, disconnectSocket } from "@/lib/socket";
+import { disconnectSocket } from "@/lib/socket";
 import { Outlet, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -19,7 +19,7 @@ const Layout: React.FC = () => {
   }, [navigationPath, navigate]);
   useEffect(() => {
     if (isAuthenticated && username) {
-      const socket = connectSocket(username);
+      //const socket = connectSocket(username);
 
       return () => {
         disconnectSocket();

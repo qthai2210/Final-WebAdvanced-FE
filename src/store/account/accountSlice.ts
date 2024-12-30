@@ -31,7 +31,6 @@ export const getUserAccounts = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await accountService.getUserAccounts();
-      console.log("your accounts response:", response);
       return response;
     } catch (error: any) {
       toast.error(
@@ -49,7 +48,6 @@ export const getAccountByAccountNumber = createAsyncThunk(
       const response = await accountService.getAccountByAccountNumber(
         accountNumber
       );
-      console.log("your accounts response:", response);
       return response;
     } catch (error: any) {
       toast.error(

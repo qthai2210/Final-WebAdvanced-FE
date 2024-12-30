@@ -3,6 +3,8 @@ import Layout from "../components/Layout";
 import StaffManagement from "@/components/admin/StaffManagement";
 import { EmployeeDashboard } from "@/pages/employee/Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
+import { ViewTransactionHistoryCard } from "@/components/employee/ViewTransactionHistoryCard";
+import { DepositMoneyIntoUserAccount } from "@/components/employee/DepositMoneyIntoUserAccount";
 
 export const EmployeeRoutes: RouteObject[] = [
   {
@@ -29,6 +31,18 @@ export const EmployeeRoutes: RouteObject[] = [
         path: "settings",
         // element: <AdminSettings />
       },
+      {
+        path: "transaction-history",
+        element: (
+          <ViewTransactionHistoryCard />
+        )
+      },
+      {
+        path: "deposit-money",
+        element: (
+          <DepositMoneyIntoUserAccount />
+        )
+      }
     ],
   },
 ];

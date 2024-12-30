@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { employeeService } from "@/services/employee.service";
 import { RegisterWithoutPasswordDto } from "@/types/user.types";
+import { DepositMoneyCreateDto, TransactionHistoryQueryDto } from "@/types/transaction.types";
 
 interface CustomerState {
   customers: any[];
@@ -11,6 +12,7 @@ interface CustomerState {
   userCreationError: string | null;
   verificationLoading: boolean;
   verificationError: string | null;
+  data: any | null;
 }
 
 const initialState: CustomerState = {
@@ -21,6 +23,7 @@ const initialState: CustomerState = {
   userCreationError: null,
   verificationLoading: false,
   verificationError: null,
+  data: [],
 };
 
 export const createUserAccount = createAsyncThunk(
@@ -63,6 +66,32 @@ export const verifyUserOtp = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch transaction history
+export const fetchTransactionHistory = createAsyncThunk(
+  "transactions/history",
+  async (query: TransactionHistoryQueryDto, { rejectWithValue }) => {
+    try {
+      const response = await employeeService.getTransactionHistory(query);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const depositMoney = createAsyncThunk(
+  'employee/deposit-money',
+  async (depositData: DepositMoneyCreateDto, { rejectWithValue }) => {
+    try {
+      const response = await employeeService.depositMoney(depositData);
+      console.log(response)
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'An error occurred while depositing money.');
+    }
+  }
+);
+
 const employeeSlice = createSlice({
   name: "employee",
   initialState,
@@ -98,7 +127,31 @@ const employeeSlice = createSlice({
       .addCase(verifyUserOtp.rejected, (state, action) => {
         state.verificationLoading = false;
         state.verificationError = action.payload as string;
-      });
+      })
+      .addCase(fetchTransactionHistory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTransactionHistory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(fetchTransactionHistory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(depositMoney.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(depositMoney.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(depositMoney.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
   },
 });
 

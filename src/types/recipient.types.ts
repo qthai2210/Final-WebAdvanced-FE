@@ -16,6 +16,7 @@ export interface Recipient {
   __v: number;
   nickname?: string;
   isRecipient: boolean;
+  bankCode?: string;
 }
 
 export interface CreateRecipientDto {

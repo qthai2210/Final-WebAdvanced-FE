@@ -17,9 +17,7 @@ import { setNavigationPath } from "@/store/auth/authSlice";
 
 const ExternalTransferPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { currentTransfer, loading } = useSelector(
-    (state: RootState) => state.transaction
-  );
+  const { loading } = useSelector((state: RootState) => state.transaction);
   const [formData, setFormData] = useState<TransactionFormData>({
     toAccount: "",
     bankId: "676fb538732f63c359d59d03", // New field for bank selection

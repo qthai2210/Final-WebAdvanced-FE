@@ -1,10 +1,7 @@
-import { cancelDebt } from "@/store/debt/debtSlice";
 import { axiosInstance } from "../lib/axios";
 import {
   CancelDebtDto,
   DebtSummary,
-  PayDebtData,
-  SendPaymentOtpData,
   PayDebtDto,
   SendPaymentOtpDto,
 } from "../types/debt.types";

@@ -9,4 +9,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    host: true, // Listen on all network interfaces
+    port: 3000, // Specify your port
+    strictPort: true, // Don't try other ports if 3000 is taken
+  },
 });

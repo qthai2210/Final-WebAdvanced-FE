@@ -134,7 +134,10 @@ const Header: React.FC = () => {
             <div className="text-sm">
               <span className="text-gray-500">Balance:</span>
               <span className="ml-2 font-semibold">
-                ${account?.balance || 0}
+                $
+                {account?.balance
+                  ? new Intl.NumberFormat().format(account.balance)
+                  : 0}
               </span>
             </div>
 
@@ -253,55 +256,84 @@ const Header: React.FC = () => {
       </div>
 
       {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link
-              to="/dashboard"
-              className="block px-3 py-2 text-gray-700 hover:text-blue-600"
-              onClick={() => handleNavigation("/dashboard")}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/transactions"
-              className="block px-3 py-2 text-gray-700 hover:text-blue-600"
-              onClick={() => handleNavigation("/transactions")}
-            >
-              Transactions
-            </Link>
-            <Link
-              to="/payments"
-              className="block px-3 py-2 text-gray-700 hover:text-blue-600"
-              onClick={() => handleNavigation("/payments")}
-            >
-              Payments
-            </Link>
-            <Link
-              to="/debts"
-              className="block px-3 py-2 text-gray-700 hover:text-blue-600"
-              onClick={() => handleNavigation("/debts")}
-            >
-              Debt Management
-            </Link>
-            <Link
-              to="/cards"
-              className="block px-3 py-2 text-gray-700 hover:text-blue-600"
-              onClick={() => handleNavigation("/cards")}
-            >
-              Cards
-            </Link>
-            <div className="px-3 py-2">
-              <div className="text-sm">
-                <span className="text-gray-500">Balance:</span>
-                <span className="ml-2 font-semibold">
-                  ${account?.balance || 0}
-                </span>
+      <div
+        className={`md:hidden overflow-hidden transition-[max-height] duration-500 ease-in-out ${
+          isMenuOpen ? "max-h-screen" : "max-h-0"
+        }`}
+      >
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <Link
+            to="/dashboard"
+            className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+            onClick={() => handleNavigation("/dashboard")}
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/transactions"
+            className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+            onClick={() => handleNavigation("/transactions")}
+          >
+            Transactions
+          </Link>
+          <Link
+            to="/payments"
+            className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+            onClick={() => handleNavigation("/payments")}
+          >
+            Payments
+          </Link>
+          <Link
+            to="/debts"
+            className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+            onClick={() => handleNavigation("/debts")}
+          >
+            Debt Management
+          </Link>
+          <Link
+            to="/cards"
+            className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+            onClick={() => handleNavigation("/cards")}
+          >
+            Cards
+          </Link>
+          <hr className="bg-gray-700" />
+          {isAuthenticated ? (
+            <div>
+              <div className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <Link
+                  to="/change-password"
+                  onClick={() => handleNavigation("/change-password")}
+                >
+                  Change password
+                </Link>
               </div>
+
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <Link to="/login">Login</Link>
+            </div>
+          )}
+          <div className="px-3 py-2">
+            <div className="text-sm">
+              <span className="text-gray-500">Balance:</span>
+              <span className="ml-2 font-semibold">
+                $
+                {account?.balance
+                  ? new Intl.NumberFormat().format(account.balance)
+                  : 0}
+              </span>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 };
