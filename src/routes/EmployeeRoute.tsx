@@ -1,43 +1,39 @@
 import { RouteObject } from "react-router-dom";
-import Layout from "../components/Layout";
-import StaffManagement from "@/components/admin/StaffManagement";
-import { EmployeeDashboard } from "@/pages/employee/Dashboard";
+import EmployeeLayout from "@/components/EmployeeLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import { EmployeeDashboard } from "@/pages/employee/Dashboard";
+import { CreateCustomerPage } from "@/pages/employee/CreateCustomer";
+import { TransactionHistoryPage } from "@/pages/employee/TransactionHistory";
 
 export const EmployeeRoutes: RouteObject[] = [
   {
     path: "/employee",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <EmployeeLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
-        index: true,
-        element: (
-          <ProtectedRoute>
-            <EmployeeDashboard />
-          </ProtectedRoute>
-        ),
+        path: "dashboard",
+        element: <EmployeeDashboard></EmployeeDashboard>, // Replace with actual components
       },
       {
-        path: "staff",
-        element: <StaffManagement />,
+        path: "create-customer",
+        element: <CreateCustomerPage></CreateCustomerPage>,
       },
       {
-        path: "users",
-        // element: <UserManagement />
+        path: "transaction-history",
+        element: <TransactionHistoryPage></TransactionHistoryPage>,
       },
       {
-        path: "settings",
-        // element: <AdminSettings />
+        path: "reports",
+        element: <div>Reports</div>,
       },
       {
-        path: "transaction/history",
-        // element: (
-        //   <ProtectedRoute>
-
-        //   </ProtectedRoute>
-        // )
-
-      }
+        path: "notifications",
+        element: <div>Notifications</div>,
+      },
     ],
   },
 ];
