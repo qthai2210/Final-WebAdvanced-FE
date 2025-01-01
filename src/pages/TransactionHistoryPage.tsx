@@ -82,7 +82,7 @@ const TransactionHistoryPage = () => {
               <option value="all">All</option>
               <option value="receiver">Receiver</option>
               <option value="sender">Sender</option>
-              <option value="debit">Debit</option>
+              <option value="debt">Debt</option>
             </select>
           </div>
         </div>

@@ -3,7 +3,7 @@ export type Transaction = {
   description: string;
   amount: number;
   date: Date;
-  type: "receiver" | "sender" | "debit";
+  type: "receiver" | "sender" | "debt";
 };
 
 export interface TransferFormData {
