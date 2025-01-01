@@ -63,7 +63,7 @@ export function DepositMoneyIntoUserAccount() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FormField label="Account Number" name="accountNumber" form={form} />
 
-          <FormField label="Full Name" name="username" form={form} />
+          <FormField className="my-6" label="Full Name" name="username" form={form} />
 
           <FormFieldNumber label="Amount" name="amount" form={form} />
 
