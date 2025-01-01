@@ -17,6 +17,55 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
+import { useSidebar } from "@/contexts/SidebarContext";
+
+const navigationItems = [
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    href: "/employee/dashboard",
+  },
+  {
+    title: "Customer Management",
+    icon: Users,
+    href: "/employee/customers",
+  },
+  {
+    title: "Create Customer",
+    icon: Users,
+    href: "/employee/create-customer",
+  },
+  {
+    title: "Transactions",
+    icon: CircleDollarSign,
+    href: "/employee/transactions",
+  },
+  {
+    title: "Transaction History",
+    icon: ScrollText,
+    href: "/employee/transaction-history",
+  },
+  {
+    title: "Reports",
+    icon: FileSpreadsheet,
+    href: "/employee/reports",
+  },
+  {
+    title: "Approvals",
+    icon: ScrollText,
+    href: "/employee/approvals",
+  },
+  {
+    title: "Notifications",
+    icon: BellRing,
+    href: "/employee/notifications",
+  },
+  {
+    title: "Support Tickets",
+    icon: AlertCircle,
+    href: "/employee/support",
+  },
+];
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   isCollapsed: boolean;
@@ -33,54 +82,7 @@ export function EmployeeSidebar({
   const dispatch = useDispatch<AppDispatch>();
   //const navigate = useNavigate();
   const location = useLocation();
-
-  const navigationItems = [
-    {
-      title: "Dashboard",
-      icon: LayoutDashboard,
-      href: "/employee/dashboard",
-    },
-    {
-      title: "Customer Management",
-      icon: Users,
-      href: "/employee/customers",
-    },
-    {
-      title: "Create Customer",
-      icon: Users,
-      href: "/employee/create-customer",
-    },
-    {
-      title: "Transactions",
-      icon: CircleDollarSign,
-      href: "/employee/transactions",
-    },
-    {
-      title: "Transaction History",
-      icon: ScrollText,
-      href: "/employee/transaction-history",
-    },
-    {
-      title: "Reports",
-      icon: FileSpreadsheet,
-      href: "/employee/reports",
-    },
-    {
-      title: "Approvals",
-      icon: ScrollText,
-      href: "/employee/approvals",
-    },
-    {
-      title: "Notifications",
-      icon: BellRing,
-      href: "/employee/notifications",
-    },
-    {
-      title: "Support Tickets",
-      icon: AlertCircle,
-      href: "/employee/support",
-    },
-  ];
+  //const { isExpanded, setIsExpanded } = useSidebar();
 
   // Check if current path matches the navigation item
   const isActivePath = (path: string) => location.pathname === path;
