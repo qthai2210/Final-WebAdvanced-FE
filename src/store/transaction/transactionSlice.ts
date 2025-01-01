@@ -70,9 +70,11 @@ export const getMyTransactions = createAsyncThunk(
         amount: fetchTransaction.amount,
         date: fetchTransaction.updatedAt,
         type:
-          fetchTransaction.type === "debt_payment"
-            ? "debt"
-            : (fetchTransaction.feeType as "receiver" | "sender"),
+          fetchTransaction.fromAccount === query.accountNumber
+            ? fetchTransaction.type === "debt_payment"
+              ? "debt"
+              : "sender"
+            : "receiver",
       }));
 
       return transactions;
