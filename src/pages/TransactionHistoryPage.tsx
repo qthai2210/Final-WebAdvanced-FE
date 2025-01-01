@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import TransactionItem from "@/components/dashboard/TransactionItem";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -37,6 +37,10 @@ const TransactionHistoryPage = () => {
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
   };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [transactionType, searchTerm]);
 
   if (loading)
     return (
