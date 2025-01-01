@@ -1,5 +1,5 @@
 import { RouteObject } from "react-router-dom";
-import EmployeeLayout from "@/components/EmployeeLayout";
+import EmployeeLayout from "@/components/employee/EmployeeLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import { EmployeeDashboard } from "@/pages/employee/Dashboard";
 import { CreateCustomerPage } from "@/pages/employee/CreateCustomer";
