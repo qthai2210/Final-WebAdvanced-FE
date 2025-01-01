@@ -41,6 +41,11 @@ const navigationItems = [
     href: "/employee/transactions",
   },
   {
+    title: "Deposit Money",
+    icon: CircleDollarSign,
+    href: "/employee/deposit-money",
+  },
+  {
     title: "Transaction History",
     icon: ScrollText,
     href: "/employee/transaction-history",
