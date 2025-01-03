@@ -11,7 +11,7 @@ const TransferGuard: React.FC<TransferGuardProps> = ({ children }) => {
   const { status } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
 
-  if (status === "nottansfer") {
+  if (status === "nottransfer") {
     toast.error("Your account is locked and cannot perform any transfer.");
     dispatch(setNavigationPath("/dashboard"));
     return null;

@@ -12,7 +12,7 @@ interface AuthState {
   refreshToken: string | null;
   isAuthenticated: boolean;
   loading: boolean;
-  status?: "active" | "locked" | "pending" | "nottansfer"; // Add this
+  status?: "active" | "locked" | "pending" | "nottransfer"; // Add this
   error: string | null;
   navigationPath: string | null; // Add this
   role: UserRole | null; // Add this
