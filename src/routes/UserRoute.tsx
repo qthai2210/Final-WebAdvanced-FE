@@ -10,6 +10,7 @@ import RecipientListPage from "@/pages/RecipientListPage";
 import InternalTransferPage from "@/pages/InternalTransferPage";
 import ExternalTransferPage from "@/pages/ExternalTransferPage";
 import TransactionHistoryPage from "@/pages/TransactionHistoryPage";
+import TransferGuard from "@/components/guards/TransferGuard";
 
 export const UserRoutes: RouteObject[] = [
   {
@@ -49,7 +50,9 @@ export const UserRoutes: RouteObject[] = [
         path: "transactions/internal",
         element: (
           <ProtectedRoute>
-            <InternalTransferPage />
+            <TransferGuard>
+              <InternalTransferPage />
+            </TransferGuard>
           </ProtectedRoute>
         ),
       },
@@ -57,7 +60,9 @@ export const UserRoutes: RouteObject[] = [
         path: "transactions/external",
         element: (
           <ProtectedRoute>
-            <ExternalTransferPage />
+            <TransferGuard>
+              <ExternalTransferPage />
+            </TransferGuard>
           </ProtectedRoute>
         ),
       },
