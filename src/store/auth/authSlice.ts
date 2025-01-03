@@ -12,6 +12,7 @@ interface AuthState {
   refreshToken: string | null;
   isAuthenticated: boolean;
   loading: boolean;
+  status?: "active" | "locked" | "pending" | "nottansfer"; // Add this
   error: string | null;
   navigationPath: string | null; // Add this
   role: UserRole | null; // Add this
@@ -317,11 +318,10 @@ const authSlice = createSlice({
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
         state.role = action.payload.user.role; // Add this
-
+        state.status = action.payload.user.status; // Add this
         // Connect socket after successful login
         connectSocket(action.payload.user.id);
 
-        console.log("autoLogin -> action.payload", action.payload);
         if (action.payload.user.role === UserRole.CUSTOMER) {
           state.navigationPath = "/dashboard";
         } else if (action.payload.user.role === UserRole.EMPLOYEE) {
@@ -346,6 +346,7 @@ const authSlice = createSlice({
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
         state.role = action.payload.user.role; // Add this
+        state.status = action.payload.user.status; // Add this
         localStorage.removeItem("recaptchaToken");
         console.log("autoLogin -> action.payload", action.payload);
         if (action.payload.user.role === UserRole.CUSTOMER) {
@@ -391,7 +392,7 @@ const authSlice = createSlice({
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
         state.role = action.payload.user.role; // Add this
-
+        state.status = action.payload.user.status; // Add this
         // Connect socket after successful auto login
         connectSocket(action.payload.user.id);
 
