@@ -20,6 +20,9 @@ interface AuthState {
   forgotPasswordLoading: boolean;
   verifyOTPLoading: boolean;
   resetPasswordLoading: boolean;
+  lockTransactionLoading: boolean;
+  unlockTransactionLoading: boolean;
+  verifyUnlockLoading: boolean;
 }
 
 const initialState: AuthState = {
@@ -35,6 +38,9 @@ const initialState: AuthState = {
   forgotPasswordLoading: false,
   verifyOTPLoading: false,
   resetPasswordLoading: false,
+  lockTransactionLoading: false,
+  unlockTransactionLoading: false,
+  verifyUnlockLoading: false,
 };
 
 export interface RegisterDto {
@@ -293,6 +299,50 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+export const lockTransaction = createAsyncThunk(
+  "auth/lockTransaction",
+  async (_, { rejectWithValue }) => {
+    try {
+      await authService.lockTransaction();
+      toast.success("Your account has been locked for transactions");
+      return "nottransfer";
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to lock transactions"
+      );
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const unlockTransaction = createAsyncThunk(
+  "auth/unlockTransaction",
+  async (_, { rejectWithValue }) => {
+    try {
+      await authService.unlockTransaction();
+      toast.success("Unlock request has been sent. Please check your mail");
+      return true;
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to request unlock");
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const verifyUnlockTransaction = createAsyncThunk(
+  "auth/verifyUnlockTransaction",
+  async (otp: string, { rejectWithValue }) => {
+    try {
+      await authService.verifyUnlockTransaction(otp);
+      toast.success("Your account has been unlocked");
+      return "active";
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to verify unlock");
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -488,6 +538,47 @@ const authSlice = createSlice({
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.resetPasswordLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // Lock Transaction
+      .addCase(lockTransaction.pending, (state) => {
+        state.lockTransactionLoading = true;
+        state.error = null;
+      })
+      .addCase(lockTransaction.fulfilled, (state, action) => {
+        state.lockTransactionLoading = false;
+        state.status = action.payload;
+      })
+      .addCase(lockTransaction.rejected, (state, action) => {
+        state.lockTransactionLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // Unlock Transaction Request
+      .addCase(unlockTransaction.pending, (state) => {
+        state.unlockTransactionLoading = true;
+        state.error = null;
+      })
+      .addCase(unlockTransaction.fulfilled, (state) => {
+        state.unlockTransactionLoading = false;
+      })
+      .addCase(unlockTransaction.rejected, (state, action) => {
+        state.unlockTransactionLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // Verify Unlock Transaction
+      .addCase(verifyUnlockTransaction.pending, (state) => {
+        state.verifyUnlockLoading = true;
+        state.error = null;
+      })
+      .addCase(verifyUnlockTransaction.fulfilled, (state, action) => {
+        state.verifyUnlockLoading = false;
+        state.status = action.payload;
+      })
+      .addCase(verifyUnlockTransaction.rejected, (state, action) => {
+        state.verifyUnlockLoading = false;
         state.error = action.payload as string;
       });
   },

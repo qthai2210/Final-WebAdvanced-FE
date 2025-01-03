@@ -73,4 +73,16 @@ export const authService = {
       confirmPassword,
     });
   },
+
+  lockTransaction: async () => {
+    await axiosInstance.post("/auth/lock-account");
+  },
+
+  unlockTransaction: async () => {
+    await axiosInstance.post("/auth/request-unlock");
+  },
+
+  verifyUnlockTransaction: async (otp: string) => {
+    await axiosInstance.post("/auth/verify-unlock", { otp });
+  },
 };

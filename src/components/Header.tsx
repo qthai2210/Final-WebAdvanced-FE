@@ -3,7 +3,13 @@ import { Link } from "react-router-dom";
 import { Bell, User, Menu, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
-import { logout, setNavigationPath } from "../store/auth/authSlice";
+import {
+  lockTransaction,
+  logout,
+  setNavigationPath,
+  unlockTransaction,
+  verifyUnlockTransaction,
+} from "../store/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import {
   markNotificationAsRead,
@@ -12,6 +18,10 @@ import {
   fetchUnreadCount,
 } from "@/store/notifications/notificationSlice";
 import { getUserAccounts } from "@/store/account/accountSlice";
+import { useState } from "react";
+import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/24/outline";
+import UnlockOTPDialog from "./UnlockOTPDialog";
+import { toast } from "react-toastify";
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -28,6 +38,8 @@ const Header: React.FC = () => {
     (state: RootState) => state.notifications
   );
   const { account } = useSelector((state: RootState) => state.account);
+  const [showUnlockOTP, setShowUnlockOTP] = useState(false);
+  const { status } = useSelector((state: RootState) => state.auth);
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -78,6 +90,36 @@ const Header: React.FC = () => {
   // Add helper function to generate unique keys
   const generateUniqueKey = (notification: any) => {
     return `${notification._id}-${notification.createdAt}-${notification.type}`;
+  };
+
+  const handleLockAccount = async () => {
+    try {
+      await dispatch(lockTransaction());
+      toast.success("This account can't transfer money anymore");
+    } catch (error) {
+      console.log("Failed to lock account", error);
+      toast.error("Failed to lock account");
+    }
+  };
+
+  const handleRequestUnlock = async () => {
+    try {
+      await dispatch(unlockTransaction());
+      setShowUnlockOTP(true);
+    } catch (error) {
+      console.log("Failed to request unlock", error);
+      toast.error("Failed to request unlock");
+    }
+  };
+
+  const handleUnlockOTPSubmit = async (otp: string) => {
+    try {
+      await dispatch(verifyUnlockTransaction(otp));
+      setShowUnlockOTP(false);
+    } catch (error) {
+      console.log("Failed to verify unlock code", error);
+      toast.error("Failed to verify unlock code");
+    }
   };
 
   return (
@@ -226,6 +268,26 @@ const Header: React.FC = () => {
                         </Link>
                       </div>
 
+                      {status === "active" && (
+                        <button
+                          onClick={handleLockAccount}
+                          className="w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-gray-100 flex items-center gap-2"
+                        >
+                          <LockClosedIcon className="h-4 w-4" />
+                          Lock Account
+                        </button>
+                      )}
+
+                      {status === "nottransfer" && (
+                        <button
+                          onClick={handleRequestUnlock}
+                          className="w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-gray-100 flex items-center gap-2"
+                        >
+                          <LockOpenIcon className="h-4 w-4" />
+                          Unlock Account
+                        </button>
+                      )}
+
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
@@ -309,6 +371,26 @@ const Header: React.FC = () => {
                 </Link>
               </div>
 
+              {status === "active" && (
+                <button
+                  onClick={handleLockAccount}
+                  className="w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <LockClosedIcon className="h-4 w-4" />
+                  Lock Account
+                </button>
+              )}
+
+              {status === "nottransfer" && (
+                <button
+                  onClick={handleRequestUnlock}
+                  className="w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <LockOpenIcon className="h-4 w-4" />
+                  Unlock Account
+                </button>
+              )}
+
               <button
                 onClick={handleLogout}
                 className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
@@ -334,6 +416,13 @@ const Header: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Add UnlockOTPDialog */}
+      <UnlockOTPDialog
+        isOpen={showUnlockOTP}
+        onClose={() => setShowUnlockOTP(false)}
+        onConfirm={handleUnlockOTPSubmit}
+      />
     </header>
   );
 };
