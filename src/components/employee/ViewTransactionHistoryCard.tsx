@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -35,6 +35,17 @@ export function ViewTransactionHistoryCard() {
       type: TransactionType.ALL,
     },
   });
+
+  // Add this effect to watch type changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'type' && currentPage !== 1) {
+        setCurrentPage(1);
+        fetchPageData(1);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
   const fetchPageData = async (page: number) => {
     try {

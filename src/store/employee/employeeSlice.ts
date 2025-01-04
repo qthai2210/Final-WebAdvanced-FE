@@ -84,10 +84,21 @@ export const depositMoney = createAsyncThunk(
   async (depositData: DepositMoneyCreateDto, { rejectWithValue }) => {
     try {
       const response = await employeeService.depositMoney(depositData);
-      console.log(response)
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'An error occurred while depositing money.');
+    }
+  }
+);
+
+export const getAccount = createAsyncThunk(
+  'employee/get-account',
+  async (searchTerm: string, { rejectWithValue }) => {
+    try {
+      const response = await employeeService.getAccount(searchTerm);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'An error occurred while fetching account data.');
     }
   }
 );
@@ -149,6 +160,18 @@ const employeeSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(depositMoney.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(getAccount.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAccount.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(getAccount.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
