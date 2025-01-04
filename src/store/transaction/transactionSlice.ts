@@ -63,16 +63,20 @@ export const getMyTransactions = createAsyncThunk(
     try {
       const response = await transactionService.getMyTransactions(query);
       toast.success("Loading transaction history successfully");
+
       const transactions = response.map((fetchTransaction: any) => ({
         id: fetchTransaction._id,
         description: fetchTransaction.content,
         amount: fetchTransaction.amount,
         date: fetchTransaction.updatedAt,
         type:
-          fetchTransaction.type === "debt_payment"
-            ? "debit"
-            : (fetchTransaction.feeType as "receiver" | "sender"),
+          fetchTransaction.fromAccount === query.accountNumber
+            ? fetchTransaction.type === "debt_payment"
+              ? "debt"
+              : "sender"
+            : "receiver",
       }));
+
       return transactions;
     } catch (error: any) {
       toast.error(

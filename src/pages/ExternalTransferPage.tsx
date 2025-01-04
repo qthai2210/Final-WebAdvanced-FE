@@ -14,7 +14,6 @@ import TransferDetails from "../components/transfer/TransferDetails";
 import FeePaymentMethod from "../components/transfer/FeePaymentMethod";
 import OTPConfirmation from "../components/transfer/OTPConfirmation";
 import { setNavigationPath } from "@/store/auth/authSlice";
-import { BanknotesIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 
 const ExternalTransferPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -95,77 +94,49 @@ const ExternalTransferPage = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <div className="flex items-center gap-3 mb-8">
-        <BanknotesIcon className="h-8 w-8 text-blue-500" />
-        <h1 className="text-2xl font-bold text-gray-800">Interbank Transfer</h1>
+    <div className="max-w-2xl mx-auto p-4 space-y-6">
+      <h1 className="text-2xl font-bold mb-6">Interbank Transfer</h1>
+
+      <SourceAccountSelector
+        onSelect={(account) =>
+          setFormData((prev) => ({ ...prev, fromAccount: account }))
+        }
+      />
+
+      <BankSelector
+        onSelect={(bankCode) => setFormData((prev) => ({ ...prev, bankCode }))}
+      />
+
+      <div className="space-y-4">
+        <label className="block">
+          <span className="text-gray-700">Recipient Account Number</span>
+          <input
+            type="text"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            value={formData.toAccount}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, toAccount: e.target.value }))
+            }
+            placeholder="Enter account number"
+          />
+        </label>
       </div>
 
-      <div className="space-y-6">
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <SourceAccountSelector
-            onSelect={(account) =>
-              setFormData((prev) => ({ ...prev, fromAccount: account }))
-            }
-          />
-        </div>
+      <TransferDetails
+        onChange={(details) => setFormData((prev) => ({ ...prev, ...details }))}
+      />
 
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <BankSelector
-            onSelect={(bankCode) =>
-              setFormData((prev) => ({ ...prev, bankCode }))
-            }
-          />
-        </div>
+      <FeePaymentMethod
+        onChange={(feeType) => setFormData((prev) => ({ ...prev, feeType }))}
+      />
 
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <label className="block">
-            <span className="text-gray-700 font-medium">
-              Recipient Account Number
-            </span>
-            <input
-              type="text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              value={formData.toAccount}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, toAccount: e.target.value }))
-              }
-              placeholder="Enter account number"
-            />
-          </label>
-        </div>
-
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <TransferDetails
-            onChange={(details) =>
-              setFormData((prev) => ({ ...prev, ...details }))
-            }
-          />
-        </div>
-
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <FeePaymentMethod
-            onChange={(feeType) =>
-              setFormData((prev) => ({ ...prev, feeType }))
-            }
-          />
-        </div>
-
-        <button
-          onClick={handleTransfer}
-          disabled={loading || !isFormValid()}
-          className="w-full py-3 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <>
-              <ArrowPathIcon className="h-5 w-5 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            "Transfer"
-          )}
-        </button>
-      </div>
+      <button
+        onClick={handleTransfer}
+        disabled={loading || !isFormValid()}
+        className="w-full py-2 px-4 bg-blue-500 text-white rounded disabled:bg-gray-300"
+      >
+        {loading ? "Processing..." : "Transfer"}
+      </button>
 
       {showOTP && (
         <OTPConfirmation
