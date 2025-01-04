@@ -45,8 +45,12 @@ export const employeeService = {
   },
 
   async depositMoney(data: DepositMoneyCreateDto) {
-    console.log(data)
     const response = await axiosInstance.post("/employee/deposit-money", data);
+    return response;
+  },
+
+  async getAccount(searchTerm: string) {
+    const response = await axiosInstance.get(`/employee/searchAccount/${searchTerm}`);
     return response;
   }
 };
