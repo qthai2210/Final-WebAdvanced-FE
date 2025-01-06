@@ -15,6 +15,8 @@ interface TransactionState {
   currentTransfer: any | null;
   loading: boolean;
   error: string | null;
+  externalAccountInfo: any | null; // Add this
+  loadingExternalInfo: boolean; // Add this
 }
 
 const initialState: TransactionState = {
@@ -22,6 +24,8 @@ const initialState: TransactionState = {
   currentTransfer: null,
   loading: false,
   error: null,
+  externalAccountInfo: null, // Add this
+  loadingExternalInfo: false, // Add this
 };
 
 export const initiateTransfer = createAsyncThunk(
@@ -105,12 +109,38 @@ export const initiateExternalTransfer = createAsyncThunk(
   }
 );
 
+// Add new thunk
+export const getExternalAccountInfo = createAsyncThunk(
+  "transaction/getExternalAccountInfo",
+  async (
+    { accountNumber, bankId }: { accountNumber: string; bankId: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await transactionService.getExternalAccountInfo(
+        accountNumber,
+        bankId
+      );
+      return response.data;
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to get account information"
+      );
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
 const transactionSlice = createSlice({
   name: "transaction",
   initialState,
   reducers: {
     clearCurrentTransfer: (state) => {
       state.currentTransfer = null;
+    },
+    // ...existing reducers...
+    clearExternalAccountInfo: (state) => {
+      state.externalAccountInfo = null;
     },
   },
   extraReducers: (builder) => {
@@ -153,9 +183,24 @@ const transactionSlice = createSlice({
       .addCase(initiateExternalTransfer.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      // Get External Account Info
+      .addCase(getExternalAccountInfo.pending, (state) => {
+        state.loadingExternalInfo = true;
+        state.error = null;
+      })
+      .addCase(getExternalAccountInfo.fulfilled, (state, action) => {
+        state.loadingExternalInfo = false;
+        state.externalAccountInfo = action.payload;
+      })
+      .addCase(getExternalAccountInfo.rejected, (state, action) => {
+        state.loadingExternalInfo = false;
+        state.error = action.payload as string;
+        state.externalAccountInfo = null;
       });
   },
 });
 
-export const { clearCurrentTransfer } = transactionSlice.actions;
+export const { clearCurrentTransfer, clearExternalAccountInfo } =
+  transactionSlice.actions;
 export default transactionSlice.reducer;
