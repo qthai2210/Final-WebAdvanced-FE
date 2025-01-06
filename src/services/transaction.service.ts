@@ -67,6 +67,19 @@ class TransactionService {
     );
     return response.data;
   }
+
+  async getExternalAccountInfo(accountNumber: string, bankId: string) {
+    const response = await axiosInstance.get(
+      `/transactions/external-transfer/info`,
+      {
+        params: {
+          accountNumber,
+          bankId,
+        },
+      }
+    );
+    return response;
+  }
 }
 
 export const transactionService = new TransactionService();
