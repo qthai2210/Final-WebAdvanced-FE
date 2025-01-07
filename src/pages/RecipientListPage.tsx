@@ -15,6 +15,7 @@ import {
   UserGroupIcon,
   ArrowRightIcon,
   BanknotesIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
 
 const RecipientListPage = () => {
@@ -46,6 +47,11 @@ const RecipientListPage = () => {
     } catch (error) {
       console.error("Failed to save/update recipient:", error);
     }
+  };
+
+  const handleAdd = () => {
+    setEditingRecipient(null);
+    setIsFormOpen(true);
   };
 
   const handleEdit = (recipient: Recipient) => {
@@ -98,10 +104,19 @@ const RecipientListPage = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <UserGroupIcon className="h-5 w-5 text-gray-600" />
-          Saved Recipients
-        </h2>
+        <div className="flex justify-between">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <UserGroupIcon className="h-5 w-5 text-gray-600" />
+            Saved Recipients
+          </h2>
+          <button
+            onClick={handleAdd}
+            className="flex items-center gap-2 bg-green-500 text-white my-2 px-3 py-2 rounded-full hover:bg-green-600 transition"
+          >
+            <PlusIcon className="h-5 w-5" />
+            <span className="text-sm font-medium">Add</span>
+          </button>
+        </div>
         <RecipientList recipients={savedRecipients || []} onEdit={handleEdit} />
       </div>
 
