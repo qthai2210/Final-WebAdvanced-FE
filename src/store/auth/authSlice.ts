@@ -234,11 +234,14 @@ export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async (changePasswordData: ChangePasswordDto, { rejectWithValue }) => {
     try {
-      await authService.changePassword(changePasswordData);
-      toast.success("Change password successfully");
-    } catch (error: any) {
-      console.log(error.response?.data?.message);
+      const response = await authService.changePassword(changePasswordData);
 
+      if (response.success) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.error.message);
+      }
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to change password");
       return rejectWithValue(error.response?.data?.message);
     }
