@@ -234,11 +234,12 @@ export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async (changePasswordData: ChangePasswordDto, { rejectWithValue }) => {
     try {
-      const response = await authService.changePassword(changePasswordData);
+      await authService.changePassword(changePasswordData);
       toast.success("Change password successfully");
-      return response;
     } catch (error: any) {
-      // toast.error(error.response?.data?.message || "Failed to change password");
+      console.log(error.response?.data?.message);
+
+      toast.error(error.response?.data?.message || "Failed to change password");
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -290,8 +291,17 @@ export const resetPassword = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      await authService.resetPassword(email, newPassword, confirmPassword);
-      toast.success("Password reset successfully");
+      const response = await authService.resetPassword(
+        email,
+        newPassword,
+        confirmPassword
+      );
+
+      if (response.success) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.error.message);
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to reset password");
       return rejectWithValue(error.response?.data?.message);
