@@ -6,40 +6,40 @@ import { useDispatch } from "react-redux";
 import { setNavigationPath } from "@/store/auth/authSlice";
 import {
   ChevronLeft,
-  LayoutDashboard,
+  //LayoutDashboard,
   Users,
   ScrollText,
-  FileSpreadsheet,
-  BellRing,
+  //FileSpreadsheet,
+  //BellRing,
   LogOut,
   Menu,
   CircleDollarSign,
-  AlertCircle,
+  //AlertCircle,
 } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
-import { useSidebar } from "@/contexts/SidebarContext";
+//import { useSidebar } from "@/contexts/SidebarContext";
 
 const navigationItems = [
-  {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-    href: "/employee/dashboard",
-  },
-  {
-    title: "Customer Management",
-    icon: Users,
-    href: "/employee/customers",
-  },
+  // {
+  //   title: "Dashboard",
+  //   icon: LayoutDashboard,
+  //   href: "/employee/dashboard",
+  // },
+  // {
+  //   title: "Customer Management",
+  //   icon: Users,
+  //   href: "/employee/customers",
+  // },
   {
     title: "Create Customer",
     icon: Users,
     href: "/employee/create-customer",
   },
-  {
-    title: "Transactions",
-    icon: CircleDollarSign,
-    href: "/employee/transactions",
-  },
+  // {
+  //   title: "Transactions",
+  //   icon: CircleDollarSign,
+  //   href: "/employee/transactions",
+  // },
   {
     title: "Deposit Money",
     icon: CircleDollarSign,
@@ -50,26 +50,26 @@ const navigationItems = [
     icon: ScrollText,
     href: "/employee/transaction-history",
   },
-  {
-    title: "Reports",
-    icon: FileSpreadsheet,
-    href: "/employee/reports",
-  },
-  {
-    title: "Approvals",
-    icon: ScrollText,
-    href: "/employee/approvals",
-  },
-  {
-    title: "Notifications",
-    icon: BellRing,
-    href: "/employee/notifications",
-  },
-  {
-    title: "Support Tickets",
-    icon: AlertCircle,
-    href: "/employee/support",
-  },
+  // {
+  //   title: "Reports",
+  //   icon: FileSpreadsheet,
+  //   href: "/employee/reports",
+  // },
+  // {
+  //   title: "Approvals",
+  //   icon: ScrollText,
+  //   href: "/employee/approvals",
+  // },
+  // {
+  //   title: "Notifications",
+  //   icon: BellRing,
+  //   href: "/employee/notifications",
+  // },
+  // {
+  //   title: "Support Tickets",
+  //   icon: AlertCircle,
+  //   href: "/employee/support",
+  // },
 ];
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {

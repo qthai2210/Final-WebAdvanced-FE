@@ -242,7 +242,7 @@ export const changePassword = createAsyncThunk(
         toast.error(response.error.message);
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to change password");
+      toast.error("All password fields must have at least 6 characters");
       return rejectWithValue(error.response?.data?.message);
     }
   }

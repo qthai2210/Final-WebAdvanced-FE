@@ -2,7 +2,10 @@ export type Transaction = {
   id: string;
   description: string;
   amount: number;
+  accountNumber: string;
+  bankName?: string;
   date: Date;
+  isInternal: boolean;
   type: "receiver" | "sender" | "debt";
 };
 
