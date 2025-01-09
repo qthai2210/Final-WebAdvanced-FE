@@ -3,6 +3,7 @@ import { AdminLayout } from "@/layouts/AdminLayout"; // Update this import path
 
 import ProtectedRoute from "./ProtectedRoute";
 import { EmployeeList } from "@/pages/admin/EmployeeList";
+import { Reconciliation } from "@/pages/admin/Reconciliation";
 
 export const AdminRoutes: RouteObject[] = [
   {
@@ -18,17 +19,15 @@ export const AdminRoutes: RouteObject[] = [
         children: [
           {
             index: true,
-            element: (
-              <h2 className="text-2xl font-bold mb-6">Dashboard Overview</h2>
-            ),
+            element: <Reconciliation />,
           },
           {
             path: "employees",
             element: <EmployeeList />,
           },
           {
-            path: "users",
-            // element: <UserManagement />
+            // path: "dashboard",
+            // element: <Reconciliation />,
           },
           {
             path: "settings",

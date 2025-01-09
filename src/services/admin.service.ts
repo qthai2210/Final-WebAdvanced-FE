@@ -1,3 +1,7 @@
+import {
+  ReconciliationQueryDto,
+  ReconciliationResponseDto,
+} from "@/types/transaction.types";
 import { axiosInstance } from "../lib/axios";
 import {
   CreateEmployeeDto,
@@ -6,6 +10,82 @@ import {
   EmployeeFilter,
   PaginatedResponse,
 } from "@/types/admin.types";
+
+interface BankInfo {
+  _id: string;
+  name: string;
+  code: string;
+  apiEndpoint: string;
+  isActive: boolean;
+}
+
+const transformReconciliationData = (
+  response: any
+): ReconciliationResponseDto => {
+  // Group transactions by bank
+  const bankTransactions = response.data.data.reduce(
+    (acc: any, transaction: any) => {
+      const bankId = transaction.bankId?._id || "unknown";
+      const bankName = transaction.bankId?.name || "Unknown Bank";
+
+      if (!acc[bankId]) {
+        acc[bankId] = {
+          bankName,
+          bankId,
+          totalReceived: 0,
+          totalSent: 0,
+          transactionCount: 0,
+          transactions: [],
+        };
+      }
+
+      const amount = transaction.amount;
+      if (transaction.type === "external_receive") {
+        acc[bankId].totalReceived += amount;
+      } else if (transaction.type === "external_transfer") {
+        acc[bankId].totalSent += amount;
+      }
+
+      acc[bankId].transactionCount++;
+      acc[bankId].transactions.push({
+        id: transaction._id,
+        type: transaction.type === "external_receive" ? "received" : "sent",
+        amount: transaction.amount,
+        fromAccount: transaction.fromAccount,
+        toAccount: transaction.toAccount,
+        content: transaction.content,
+        createdAt: transaction.createdAt,
+        status: transaction.status,
+      });
+
+      return acc;
+    },
+    {}
+  );
+
+  // Calculate totals and format response
+  const banks = Object.values(bankTransactions);
+  const totalAmount = banks.reduce(
+    (sum: number, bank: any) => sum + bank.totalReceived + bank.totalSent,
+    0
+  );
+  const totalTransactions = banks.reduce(
+    (sum: number, bank: any) => sum + bank.transactionCount,
+    0
+  );
+
+  return {
+    totalAmount,
+    totalTransactions,
+    banks,
+    metadata: {
+      total: parseInt(response.data.metadata.total),
+      page: parseInt(response.data.metadata.page),
+      lastPage: parseInt(response.data.metadata.lastPage),
+      limit: parseInt(response.data.metadata.limit),
+    },
+  };
+};
 
 export const adminService = {
   // Employee management
@@ -88,5 +168,23 @@ export const adminService = {
   validateToken: async () => {
     const response = await axiosInstance.get("/admin/employees/validate-token");
     return response.data;
+  },
+  async getReconciliationReport(
+    query: ReconciliationQueryDto
+  ): Promise<ReconciliationResponseDto> {
+    const response = await axiosInstance.get(
+      "/admin/employees/reconciliation",
+      {
+        params: query,
+      }
+    );
+    return transformReconciliationData(response.data);
+  },
+
+  getCurrentBank: async (): Promise<BankInfo[]> => {
+    const response = await axiosInstance.get("/external/banks");
+    // Add console.log to debug the response
+    console.log("Bank Info Response:", response.data);
+    return response.data.data || response.data; // Handle both nested and direct response
   },
 };
