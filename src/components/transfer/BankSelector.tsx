@@ -12,6 +12,7 @@ const BankSelector: React.FC<BankSelectorProps> = ({
   const banks = [
     { name: "Group11", code: "group11", bankId: "676fb443732f63c359d59d02" },
     { name: "Group10", code: "CVB", bankId: "676fb538732f63c359d59d03" },
+    { name: "Group20", code: "group11", bankId: "677f787fd80ae4c0f8de6527" },
     // Add more banks as needed
   ];
 
