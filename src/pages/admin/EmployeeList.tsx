@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
-import { getEmployees } from "@/store/admin/adminSlice";
+import {
+  getEmployees,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
+} from "@/store/admin/adminSlice";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -21,6 +26,7 @@ import {
   Search,
   MoreVertical,
   ChevronDown,
+  AlertCircle,
 } from "lucide-react";
 import { UserStatus } from "@/types/Enums/User.enum";
 import {
@@ -38,6 +44,26 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { CreateEmployeeDto } from "@/types/admin.types";
+import { toast } from "react-toastify";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function EmployeeList() {
   const dispatch = useDispatch<AppDispatch>();
@@ -60,6 +86,30 @@ export function EmployeeList() {
       | undefined,
     sortOrder: "desc" as "asc" | "desc",
   });
+
+  const [newEmployee, setNewEmployee] = useState<CreateEmployeeDto>({
+    username: "",
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    fullName: "",
+    phone: "",
+    identityNumber: "",
+    dateOfBirth: undefined,
+    address: "",
+  });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editEmployee, setEditEmployee] = useState<CreateEmployeeDto | null>(
+    null
+  );
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   useEffect(() => {
     try {
@@ -95,31 +145,447 @@ export function EmployeeList() {
     setFilters((prev) => ({ ...prev, page }));
   };
 
-  // const handleEditClick = (employee: any) => {
-  //   // Handle edit click
-  // };
+  const handleCreateEmployee = async () => {
+    try {
+      // Combine firstName and lastName to create fullName
+      const employeeData = {
+        ...newEmployee,
+        fullName: `${newEmployee.firstName} ${newEmployee.lastName}`.trim(),
+      };
 
-  // const handleDeleteStaff = (id: string) => {
-  //   // Handle delete click
-  // };
+      await dispatch(createEmployee(employeeData)).unwrap();
+      setIsDialogOpen(false);
+      dispatch(getEmployees(filters));
+      setNewEmployee({
+        username: "",
+        email: "",
+        password: "",
+        firstName: "",
+        lastName: "",
+        fullName: "",
+        phone: "",
+        identityNumber: "",
+        dateOfBirth: undefined,
+        address: "",
+      });
+    } catch (error: any) {
+      console.error("Failed to create employee:", error);
+      if (Array.isArray(error?.response?.data?.message)) {
+        // Handle array of error messages
+        error.response.data.message.forEach((msg: string) => {
+          toast.error(msg);
+        });
+      } else {
+        toast.error(
+          error?.response?.data?.message || "Failed to create employee"
+        );
+      }
+    }
+  };
+
+  const handleEditClick = (employee: Employee) => {
+    // Split fullName into firstName and lastName
+    const [firstName = "", lastName = ""] = employee.fullName.split(" ");
+
+    setEditEmployee({
+      username: employee.username,
+      email: employee.email,
+      phone: employee.phone,
+      firstName,
+      lastName,
+      fullName: employee.fullName,
+      password: "", // Empty password as we don't want to update it by default
+      identityNumber: employee.identityNumber,
+      dateOfBirth: employee.dateOfBirth,
+      address: employee.address,
+    });
+    setSelectedEmployeeId(employee.id);
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateEmployee = async () => {
+    if (!editEmployee || !selectedEmployeeId) return;
+
+    try {
+      const updateData = {
+        ...editEmployee,
+        fullName: `${editEmployee.firstName} ${editEmployee.lastName}`.trim(),
+      };
+
+      await dispatch(
+        updateEmployee({
+          id: selectedEmployeeId,
+          data: updateData,
+        })
+      ).unwrap();
+
+      setEditDialogOpen(false);
+      dispatch(getEmployees(filters));
+    } catch (error: any) {
+      console.error("Failed to update employee:", error);
+      if (Array.isArray(error?.response?.data?.message)) {
+        error.response.data.message.forEach((msg: string) => {
+          toast.error(msg);
+        });
+      } else {
+        toast.error(
+          error?.response?.data?.message || "Failed to update employee"
+        );
+      }
+    }
+  };
+
+  const handleDeleteClick = (employee: Employee) => {
+    setEmployeeToDelete({ id: employee.id, name: employee.fullName });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!employeeToDelete) return;
+
+    try {
+      await dispatch(deleteEmployee(employeeToDelete.id)).unwrap();
+      dispatch(getEmployees(filters));
+      setDeleteDialogOpen(false);
+      setEmployeeToDelete(null);
+    } catch (error: any) {
+      console.error("Failed to delete employee:", error);
+      toast.error(
+        error?.response?.data?.message || "Failed to delete employee"
+      );
+    }
+  };
 
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Employee Management</CardTitle>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Employee
-          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Employee
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-white dark:bg-gray-800 [&::backdrop]:bg-black/70">
+              <DialogHeader>
+                <DialogTitle>Create New Employee</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input
+                      id="firstName"
+                      className="bg-white"
+                      value={newEmployee.firstName}
+                      onChange={(e) =>
+                        setNewEmployee({
+                          ...newEmployee,
+                          firstName: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Input
+                      id="lastName"
+                      className="bg-white"
+                      value={newEmployee.lastName}
+                      onChange={(e) =>
+                        setNewEmployee({
+                          ...newEmployee,
+                          lastName: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    className="bg-white"
+                    value={newEmployee.email}
+                    onChange={(e) =>
+                      setNewEmployee({ ...newEmployee, email: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone *</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    className="bg-white"
+                    value={newEmployee.phone}
+                    onChange={(e) =>
+                      setNewEmployee({ ...newEmployee, phone: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username *</Label>
+                  <Input
+                    id="username"
+                    className="bg-white"
+                    value={newEmployee.username}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        username: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password *</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    className="bg-white"
+                    value={newEmployee.password}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        password: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="identityNumber">Identity Number</Label>
+                  <Input
+                    id="identityNumber"
+                    className="bg-white"
+                    value={newEmployee.identityNumber}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        identityNumber: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                  <Input
+                    id="dateOfBirth"
+                    type="date"
+                    className="bg-white"
+                    value={
+                      newEmployee.dateOfBirth
+                        ? new Date(newEmployee.dateOfBirth)
+                            .toISOString()
+                            .split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        dateOfBirth: new Date(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    className="bg-white"
+                    value={newEmployee.address}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        address: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <Button onClick={handleCreateEmployee} className="w-full">
+                  Create Employee
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </CardHeader>
+
+        {/* Edit Dialog */}
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent className="bg-white dark:bg-gray-800 [&::backdrop]:bg-black/70">
+            <DialogHeader>
+              <DialogTitle>Edit Employee</DialogTitle>
+            </DialogHeader>
+            {editEmployee && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="editFirstName">First Name *</Label>
+                    <Input
+                      id="editFirstName"
+                      className="bg-white"
+                      value={editEmployee.firstName}
+                      onChange={(e) =>
+                        setEditEmployee({
+                          ...editEmployee,
+                          firstName: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="editLastName">Last Name *</Label>
+                    <Input
+                      id="editLastName"
+                      className="bg-white"
+                      value={editEmployee.lastName}
+                      onChange={(e) =>
+                        setEditEmployee({
+                          ...editEmployee,
+                          lastName: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editEmail">Email *</Label>
+                  <Input
+                    id="editEmail"
+                    type="email"
+                    className="bg-white"
+                    value={editEmployee.email}
+                    onChange={(e) =>
+                      setEditEmployee({
+                        ...editEmployee,
+                        email: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editPhone">Phone *</Label>
+                  <Input
+                    id="editPhone"
+                    type="tel"
+                    className="bg-white"
+                    value={editEmployee.phone}
+                    onChange={(e) =>
+                      setEditEmployee({
+                        ...editEmployee,
+                        phone: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editUsername">Username *</Label>
+                  <Input
+                    id="editUsername"
+                    className="bg-white"
+                    value={editEmployee.username}
+                    onChange={(e) =>
+                      setEditEmployee({
+                        ...editEmployee,
+                        username: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editPassword">Password *</Label>
+                  <Input
+                    id="editPassword"
+                    type="password"
+                    className="bg-white"
+                    value={editEmployee.password}
+                    onChange={(e) =>
+                      setEditEmployee({
+                        ...editEmployee,
+                        password: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editIdentityNumber">Identity Number</Label>
+                  <Input
+                    id="editIdentityNumber"
+                    className="bg-white"
+                    value={editEmployee.identityNumber}
+                    onChange={(e) =>
+                      setEditEmployee({
+                        ...editEmployee,
+                        identityNumber: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editDateOfBirth">Date of Birth</Label>
+                  <Input
+                    id="editDateOfBirth"
+                    type="date"
+                    className="bg-white"
+                    value={
+                      editEmployee.dateOfBirth
+                        ? new Date(editEmployee.dateOfBirth)
+                            .toISOString()
+                            .split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) =>
+                      setEditEmployee({
+                        ...editEmployee,
+                        dateOfBirth: new Date(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editAddress">Address</Label>
+                  <Input
+                    id="editAddress"
+                    className="bg-white"
+                    value={editEmployee.address}
+                    onChange={(e) =>
+                      setEditEmployee({
+                        ...editEmployee,
+                        address: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <Button onClick={handleUpdateEmployee} className="w-full">
+                  Update Employee
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
         <CardContent>
           <div className="flex items-center gap-4 mb-4">
             <div className="relative flex-1">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search employees..."
-                className="pl-8"
+                className="pl-8 bg-white"
                 value={filters.search}
                 onChange={(e) => handleSearch(e.target.value)}
               />
@@ -213,14 +679,14 @@ export function EmployeeList() {
                           >
                             <DropdownMenuItem
                               className="cursor-pointer hover:bg-gray-100 bg-white"
-                              style={{ backgroundColor: "white" }}
+                              onClick={() => handleEditClick(employee)}
                             >
                               <Edit className="h-4 w-4 mr-2" />
                               <span>Edit</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="cursor-pointer text-red-600 hover:bg-red-50 bg-white"
-                              style={{ backgroundColor: "white" }}
+                              onClick={() => handleDeleteClick(employee)}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               <span>Delete</span>
@@ -274,6 +740,40 @@ export function EmployeeList() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-white dark:bg-gray-800">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-red-500" />
+              Confirm Deletion
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete employee{" "}
+              <span className="font-semibold">{employeeToDelete?.name}</span>?
+              <br />
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setDeleteDialogOpen(false);
+                setEmployeeToDelete(null);
+              }}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
