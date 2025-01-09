@@ -50,7 +50,7 @@ const TransactionItem: React.FC<{ transaction: Transaction }> = ({
               {transaction.bankName}
             </p>
           )}
-          <p className="text-sm text-gray-900">
+          <p className="text-sm font-medium text-gray-900">
             {transaction.type === "receiver"
               ? "From account: "
               : "To account: "}
