@@ -15,10 +15,11 @@ import {
 } from "@heroicons/react/24/outline";
 
 interface AccountInfo {
-  accountNumber: string;
-  username: string;
-  fullName: string;
-  email: string;
+  accountNumber?: string;
+  username?: string;
+  fullName?: string;
+  email?: string;
+  ownerFullName?: string; // Add this field
 }
 
 interface ExternalRecipientSelectorProps {
@@ -65,14 +66,29 @@ const ExternalRecipientSelector = ({
 
   useEffect(() => {
     if (externalAccountInfo) {
-      onSelect({
-        accountNumber: externalAccountInfo.accountNumber,
-        username: externalAccountInfo.username,
-        fullName: externalAccountInfo.fullName,
-        email: externalAccountInfo.email,
-      });
+      // Handle external bank response
+      if (externalAccountInfo.data) {
+        const accountData = externalAccountInfo.data;
+        // Only call onSelect if the account data is different
+        onSelect({
+          accountNumber: accountData.accountNumber || "",
+          username: accountData.username || "",
+          fullName: accountData.fullName || "",
+          email: accountData.email || "",
+        });
+      }
+      // Handle internal bank response
+      else if (externalAccountInfo.username) {
+        // Only call onSelect if the account data is different
+        onSelect({
+          accountNumber: externalAccountInfo.accountNumber || "",
+          username: externalAccountInfo.username || "",
+          fullName: externalAccountInfo.fullName || "",
+          email: externalAccountInfo.email || "",
+        });
+      }
     }
-  }, [externalAccountInfo, onSelect]);
+  }, [externalAccountInfo]); // Remove onSelect from dependencies
 
   return (
     <div className="space-y-4">
@@ -109,30 +125,42 @@ const ExternalRecipientSelector = ({
             <div>
               <p className="text-xs text-gray-500">Account Name</p>
               <p className="font-medium text-gray-900">
-                {externalAccountInfo.fullName}
+                {externalAccountInfo.data
+                  ? externalAccountInfo.data.fullName
+                  : externalAccountInfo.fullName}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <IdentificationIcon className="h-5 w-5 text-blue-600" />
-            <div>
-              <p className="text-xs text-gray-500">Username</p>
-              <p className="font-medium text-gray-900">
-                {externalAccountInfo.username}
-              </p>
-            </div>
-          </div>
+          {/* Only show these fields for response with username and email */}
+          {(externalAccountInfo.data?.username ||
+            externalAccountInfo.username) && (
+            <>
+              <div className="flex items-center gap-3">
+                <IdentificationIcon className="h-5 w-5 text-blue-600" />
+                <div>
+                  <p className="text-xs text-gray-500">Username</p>
+                  <p className="font-medium text-gray-900">
+                    {externalAccountInfo.data
+                      ? externalAccountInfo.data.username
+                      : externalAccountInfo.username}
+                  </p>
+                </div>
+              </div>
 
-          <div className="flex items-center gap-3">
-            <EnvelopeIcon className="h-5 w-5 text-blue-600" />
-            <div>
-              <p className="text-xs text-gray-500">Email</p>
-              <p className="font-medium text-gray-900">
-                {externalAccountInfo.email}
-              </p>
-            </div>
-          </div>
+              <div className="flex items-center gap-3">
+                <EnvelopeIcon className="h-5 w-5 text-blue-600" />
+                <div>
+                  <p className="text-xs text-gray-500">Email</p>
+                  <p className="font-medium text-gray-900">
+                    {externalAccountInfo.data
+                      ? externalAccountInfo.data.email
+                      : externalAccountInfo.email}
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
