@@ -235,10 +235,14 @@ export const changePassword = createAsyncThunk(
   async (changePasswordData: ChangePasswordDto, { rejectWithValue }) => {
     try {
       const response = await authService.changePassword(changePasswordData);
-      toast.success("Change password successfully");
-      return response;
+
+      if (response.success) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.error.message);
+      }
     } catch (error: any) {
-      // toast.error(error.response?.data?.message || "Failed to change password");
+      toast.error("All password fields must have at least 6 characters");
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -290,8 +294,17 @@ export const resetPassword = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      await authService.resetPassword(email, newPassword, confirmPassword);
-      toast.success("Password reset successfully");
+      const response = await authService.resetPassword(
+        email,
+        newPassword,
+        confirmPassword
+      );
+
+      if (response.success) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.error.message);
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to reset password");
       return rejectWithValue(error.response?.data?.message);

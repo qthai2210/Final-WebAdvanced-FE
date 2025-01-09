@@ -14,6 +14,7 @@ import TransferDetails from "../components/transfer/TransferDetails";
 import FeePaymentMethod from "../components/transfer/FeePaymentMethod";
 import OTPConfirmation from "../components/transfer/OTPConfirmation";
 import { setNavigationPath } from "@/store/auth/authSlice";
+import ExternalRecipientSelector from "../components/transfer/ExternalRecipientSelector";
 
 const ExternalTransferPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -94,56 +95,63 @@ const ExternalTransferPage = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl font-bold mb-6">Interbank Transfer</h1>
 
-      <SourceAccountSelector
-        onSelect={(account) =>
-          setFormData((prev) => ({ ...prev, fromAccount: account }))
-        }
-      />
-
-      <BankSelector
-        onSelect={(bankCode) => setFormData((prev) => ({ ...prev, bankCode }))}
-      />
-
-      <div className="space-y-4">
-        <label className="block">
-          <span className="text-gray-700">Recipient Account Number</span>
-          <input
-            type="text"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            value={formData.toAccount}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, toAccount: e.target.value }))
+      <div className="space-y-6">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <SourceAccountSelector
+            onSelect={(account) =>
+              setFormData((prev) => ({ ...prev, fromAccount: account }))
             }
-            placeholder="Enter account number"
           />
-        </label>
-      </div>
+        </div>
 
-      <TransferDetails
-        onChange={(details) => setFormData((prev) => ({ ...prev, ...details }))}
-      />
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <BankSelector
+            defaultBankId={formData.bankId}
+            onSelect={(bankId) => setFormData((prev) => ({ ...prev, bankId }))}
+          />
+        </div>
 
-      <FeePaymentMethod
-        onChange={(feeType) => setFormData((prev) => ({ ...prev, feeType }))}
-      />
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <ExternalRecipientSelector
+            bankId={formData.bankId || ""}
+            onSelect={(accountInfo) =>
+              setFormData((prev) => ({
+                ...prev,
+                toAccount: accountInfo.accountNumber,
+                //recipientName: accountInfo.fullName, // Optional: store recipient name if needed
+              }))
+            }
+          />
+        </div>
 
-      <button
-        onClick={handleTransfer}
-        disabled={loading || !isFormValid()}
-        className="w-full py-2 px-4 bg-blue-500 text-white rounded disabled:bg-gray-300"
-      >
-        {loading ? "Processing..." : "Transfer"}
-      </button>
-
-      {showOTP && (
-        <OTPConfirmation
-          onConfirm={handleOTPConfirm}
-          onCancel={() => setShowOTP(false)}
+        <TransferDetails
+          onChange={(details) =>
+            setFormData((prev) => ({ ...prev, ...details }))
+          }
         />
-      )}
+
+        <FeePaymentMethod
+          onChange={(feeType) => setFormData((prev) => ({ ...prev, feeType }))}
+        />
+
+        <button
+          onClick={handleTransfer}
+          disabled={loading || !isFormValid()}
+          className="w-full py-2 px-4 bg-blue-500 text-white rounded disabled:bg-gray-300"
+        >
+          {loading ? "Processing..." : "Transfer"}
+        </button>
+
+        {showOTP && (
+          <OTPConfirmation
+            onConfirm={handleOTPConfirm}
+            onCancel={() => setShowOTP(false)}
+          />
+        )}
+      </div>
     </div>
   );
 };

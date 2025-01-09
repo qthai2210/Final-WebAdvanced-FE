@@ -67,11 +67,12 @@ export const authService = {
     newPassword: string,
     confirmPassword: string
   ) => {
-    await axiosInstance.post("/auth/reset-password", {
+    const response = await axiosInstance.post("/auth/reset-password", {
       email,
       newPassword,
       confirmPassword,
     });
+    return response.data;
   },
 
   lockTransaction: async () => {
