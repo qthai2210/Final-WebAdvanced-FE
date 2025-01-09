@@ -34,7 +34,7 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Add response interceptor only to protected instance
+//Add response interceptor only to protected instance
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {

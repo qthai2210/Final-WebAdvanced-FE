@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { AppDispatch, RootState } from "@/store/store";
@@ -94,9 +94,16 @@ const ExternalTransferPage = () => {
     );
   };
 
+  const handleRecipientSelect = useCallback((accountInfo: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      toAccount: accountInfo.accountNumber || "",
+    }));
+  }, []); // Empty dependency array since it doesn't depend on any values
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h1 className="text-2xl font-bold mb-6">Interbank Transfer</h1>
+      <h1 className="text-2xl font-bold mb-6">Exterbank Transfer</h1>
 
       <div className="space-y-6">
         <div className="bg-gray-50 p-4 rounded-lg">
@@ -117,13 +124,7 @@ const ExternalTransferPage = () => {
         <div className="bg-gray-50 p-4 rounded-lg">
           <ExternalRecipientSelector
             bankId={formData.bankId || ""}
-            onSelect={(accountInfo) =>
-              setFormData((prev) => ({
-                ...prev,
-                toAccount: accountInfo.accountNumber,
-                //recipientName: accountInfo.fullName, // Optional: store recipient name if needed
-              }))
-            }
+            onSelect={handleRecipientSelect}
           />
         </div>
 
