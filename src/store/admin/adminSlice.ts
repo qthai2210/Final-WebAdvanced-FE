@@ -179,7 +179,11 @@ const adminSlice = createSlice({
       .addCase(createEmployee.fulfilled, (state, action) => {
         state.employees.data.push(action.payload);
       })
-      // Update employee
+
+      .addCase(createEmployee.rejected, (state, action) => {
+        state.error = action.payload as string;
+        toast.error(action.payload as string);
+      })
       .addCase(updateEmployee.fulfilled, (state, action) => {
         const index = state.employees.data.findIndex(
           (emp) => emp.id === action.payload.id
