@@ -239,7 +239,9 @@ export const changePassword = createAsyncThunk(
       if (response.success) {
         toast.success(response.data.message);
       } else {
-        toast.error(response.error.message);
+        if (typeof response.error.message === "string")
+          toast.error(response.error.message);
+        else toast.error("Password must have at least 6 characters");
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to change password");
