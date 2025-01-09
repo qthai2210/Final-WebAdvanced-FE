@@ -72,7 +72,15 @@ export const getMyTransactions = createAsyncThunk(
         id: fetchTransaction._id,
         description: fetchTransaction.content,
         amount: fetchTransaction.amount,
+        accountNumber:
+          fetchTransaction.fromAccount === query.accountNumber
+            ? fetchTransaction.toAccount
+            : fetchTransaction.fromAccount,
+        bankName: fetchTransaction.bankName,
         date: fetchTransaction.updatedAt,
+        isInternal: ["i", "d"].includes(fetchTransaction.type[0])
+          ? true
+          : false,
         type:
           fetchTransaction.fromAccount === query.accountNumber
             ? fetchTransaction.type === "debt_payment"

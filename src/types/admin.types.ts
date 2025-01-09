@@ -4,7 +4,9 @@ export interface CreateEmployeeDto {
   username: string;
   email: string;
   phone: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
+  fullName?: string; // Optional as it can be generated from firstName + lastName
   password: string;
   identityNumber?: string;
   dateOfBirth?: Date;
