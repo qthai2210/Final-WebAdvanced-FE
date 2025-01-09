@@ -8,6 +8,10 @@ import {
   EmployeeFilter,
   PaginatedMetadata,
 } from "@/types/admin.types";
+import {
+  ReconciliationQueryDto,
+  ReconciliationResponseDto,
+} from "@/types/transaction.types";
 
 interface AdminState {
   employees: {
@@ -19,6 +23,16 @@ interface AdminState {
   selectedEmployee: Employee | null;
   loading: boolean;
   error: string | null;
+  reconciliation: {
+    data: ReconciliationResponseDto | null;
+    loading: boolean;
+    error: string | null;
+  };
+  bankOptions: {
+    data: { id: string; name: string }[];
+    loading: boolean;
+    error: string | null;
+  };
 }
 
 const initialState: AdminState = {
@@ -36,6 +50,16 @@ const initialState: AdminState = {
   selectedEmployee: null,
   loading: false,
   error: null,
+  reconciliation: {
+    data: null,
+    loading: false,
+    error: null,
+  },
+  bankOptions: {
+    data: [],
+    loading: false,
+    error: null,
+  },
 };
 
 // Async thunks
@@ -133,6 +157,40 @@ export const getEmployees = createAsyncThunk(
   }
 );
 
+export const getReconciliation = createAsyncThunk(
+  "admin/getReconciliation",
+  async (query: ReconciliationQueryDto, { rejectWithValue }) => {
+    try {
+      const response = await adminService.getReconciliationReport(query);
+      return response;
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to fetch reconciliation report"
+      );
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch reconciliation report"
+      );
+    }
+  }
+);
+
+export const getBankOptions = createAsyncThunk(
+  "admin/getBankOptions",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await adminService.getCurrentBank();
+      return response.map((bank) => ({
+        id: bank._id,
+        name: bank.name,
+      }));
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch bank options"
+      );
+    }
+  }
+);
+
 const adminSlice = createSlice({
   name: "admin",
   initialState,
@@ -210,6 +268,32 @@ const adminSlice = createSlice({
       .addCase(getEmployees.rejected, (state, action) => {
         state.employees.loading = false;
         state.employees.error = action.payload as string;
+      })
+      .addCase(getReconciliation.pending, (state) => {
+        state.reconciliation.loading = true;
+        state.reconciliation.error = null;
+      })
+      .addCase(getReconciliation.fulfilled, (state, action) => {
+        state.reconciliation.loading = false;
+        state.reconciliation.data = action.payload;
+        state.reconciliation.error = null;
+      })
+      .addCase(getReconciliation.rejected, (state, action) => {
+        state.reconciliation.loading = false;
+        state.reconciliation.error = action.payload as string;
+      })
+      .addCase(getBankOptions.pending, (state) => {
+        state.bankOptions.loading = true;
+        state.bankOptions.error = null;
+      })
+      .addCase(getBankOptions.fulfilled, (state, action) => {
+        state.bankOptions.loading = false;
+        state.bankOptions.data = action.payload;
+        state.bankOptions.error = null;
+      })
+      .addCase(getBankOptions.rejected, (state, action) => {
+        state.bankOptions.loading = false;
+        state.bankOptions.error = action.payload as string;
       });
   },
 });
